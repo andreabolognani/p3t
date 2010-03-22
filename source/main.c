@@ -1,6 +1,9 @@
 #include <nds.h>
 #include <stdio.h>
 
+#include <p3t_clock.h>
+#include <p3t_timer.h>
+
 #include <bgEight.h>
 #include <bgOne.h>
 
@@ -9,30 +12,8 @@ enum mode_t {
 	MODE_ONE   = 1
 };
 
-volatile int ticks;
-volatile int seconds;
 volatile u16* videoBuffer;
 volatile mode_t mode;
-
-void
-tick (void)
-{
-	ticks++;
-
-	if (ticks >= 60) {
-		seconds++;
-		ticks = 0;
-	}
-}
-
-void
-initClock (void)
-{
-	ticks = 0;
-	seconds = 0;
-
-	irqSet (IRQ_VBLANK, tick);
-}
 
 void
 initScreen (void)
@@ -66,11 +47,17 @@ initScreen (void)
 int
 main (void)
 {
-	touchPosition touch;
+	p3t_timer timer;
 	int keys;
 
-	initClock ();
+	p3t_clockInit ();
 	initScreen ();
+
+	p3t_timerInit (&timer, 1);
+	p3t_timerStart (&timer);
+	printf ("[%d] Timer %d started\n",
+	        p3t_clockGetSeconds (),
+	        p3t_timerGetNumber (&timer));
 
 	while (1) {
 
@@ -79,12 +66,12 @@ main (void)
 
 		if (keys & KEY_TOUCH) {
 
-			touchRead (&touch);
+			p3t_timerPause (&timer);
 
-			printf ("[%d] Touched %d %d\n",
-			        seconds,
-			        touch.px,
-			        touch.py);
+			printf ("[%d] Timer %d paused, %d seconds elapsed\n",
+			        p3t_clockGetSeconds (),
+			        p3t_timerGetNumber (&timer),
+			        p3t_timerGetElapsed (&timer));
 
 			mode = !mode;
 		}
