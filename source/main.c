@@ -1,11 +1,18 @@
 #include <nds.h>
 #include <stdio.h>
 
-#include <background.h>
+#include <bgEight.h>
+#include <bgOne.h>
+
+enum mode_t {
+	MODE_EIGHT = 0,
+	MODE_ONE   = 1
+};
 
 volatile int ticks;
 volatile int seconds;
-volatile u16* video_buffer;
+volatile u16* videoBuffer;
+volatile mode_t mode;
 
 void
 tick (void)
@@ -45,7 +52,11 @@ initScreen (void)
 	BACKGROUND.bg3_rotation.ydy = 1 << 8;
 	BACKGROUND.bg3_rotation.ydx = 0;
 
-	video_buffer = (u16*) BG_BMP_RAM (0);
+	videoBuffer = (u16*) BG_BMP_RAM (0);
+
+	dmaCopy (bgEightBitmap,
+			 (void *) videoBuffer,
+			 bgEightBitmapLen);
 
 	consoleDemoInit ();
 
@@ -56,22 +67,17 @@ int
 main (void)
 {
 	touchPosition touch;
-	u16 color;
-	int held;
-	int redraw;
-	int i;
+	int keys;
 
 	initClock ();
 	initScreen ();
 
 	while (1) {
 
-		redraw = 0;
-
 		scanKeys ();
-		held = keysDown ();
+		keys = keysDown ();
 
-		if (held & KEY_TOUCH) {
+		if (keys & KEY_TOUCH) {
 
 			touchRead (&touch);
 
@@ -80,20 +86,22 @@ main (void)
 			        touch.px,
 			        touch.py);
 
-			redraw = 1;
+			mode = !mode;
 		}
 
 		swiWaitForVBlank ();
 
-		if (redraw) {
-			dmaCopy (backgroundBitmap,
-			         (void *) video_buffer,
-			         backgroundBitmapLen);
-
-			color = RGB15 (31, 0, 0) | BIT (15);
-
-			i = (SCREEN_WIDTH * touch.py) + touch.px;
-			video_buffer[i] = color;
+		switch (mode) {
+			case MODE_EIGHT:
+				dmaCopy (bgEightBitmap,
+						 (void *) videoBuffer,
+						 bgEightBitmapLen);
+				break;
+			case MODE_ONE:
+				dmaCopy (bgOneBitmap,
+						 (void *) videoBuffer,
+						 bgOneBitmapLen);
+				break;
 		}
 	}
 
