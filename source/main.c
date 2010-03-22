@@ -1,6 +1,8 @@
 #include <nds.h>
 #include <stdio.h>
 
+#include <background.h>
+
 volatile int ticks;
 volatile int seconds;
 volatile u16* video_buffer;
@@ -78,20 +80,20 @@ main (void)
 			        touch.px,
 			        touch.py);
 
-			color = RGB15 (rand () % 31,
-						   rand () % 31,
-						   rand () % 31) |
-			        BIT (15);
-
 			redraw = 1;
 		}
 
 		swiWaitForVBlank ();
 
 		if (redraw) {
-			for (i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++) {
-				video_buffer[i] = color;
-			}
+			dmaCopy (backgroundBitmap,
+			         (void *) video_buffer,
+			         backgroundBitmapLen);
+
+			color = RGB15 (31, 0, 0) | BIT (15);
+
+			i = (SCREEN_WIDTH * touch.py) + touch.px;
+			video_buffer[i] = color;
 		}
 	}
 
