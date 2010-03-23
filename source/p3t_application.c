@@ -41,9 +41,6 @@ p3t_applicationUpdate (p3t_application *self,
 
 	if (elapsed >= target) {
 		p3t_timerFinish (self->timer);
-		printf ("[%d %d] Finished\n",
-		        p3t_clockGetSeconds (),
-		        p3t_timerGetNumber (self->timer));
 	}
 
 	if (input & KEY_TOUCH) {
@@ -53,35 +50,21 @@ p3t_applicationUpdate (p3t_application *self,
 			case P3T_TIMER_STATE_STOPPED:
 
 				p3t_timerStart (self->timer);
-				printf ("[%d %d] Started\n",
-						p3t_clockGetSeconds (),
-						p3t_timerGetNumber (self->timer));
 				break;
 
 			case P3T_TIMER_STATE_RUNNING:
 
 				p3t_timerPause (self->timer);
-				printf ("[%d %d] Paused, %ds elapsed\n",
-						p3t_clockGetSeconds (),
-						p3t_timerGetNumber (self->timer),
-						p3t_timerGetElapsed (self->timer));
 				break;
 
 			case P3T_TIMER_STATE_PAUSED:
 
 				p3t_timerContinue (self->timer);
-				printf ("[%d %d] Restarted, %ds elapsed\n",
-						p3t_clockGetSeconds (),
-						p3t_timerGetNumber (self->timer),
-						p3t_timerGetElapsed (self->timer));
 				break;
 
 			case P3T_TIMER_STATE_FINISHED:
 
 				p3t_timerStop (self->timer);
-				printf ("[%d %d] Stopped\n",
-						p3t_clockGetSeconds (),
-						p3t_timerGetNumber (self->timer));
 				break;
 		}
 	}
