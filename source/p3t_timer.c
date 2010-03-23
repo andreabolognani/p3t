@@ -1,7 +1,8 @@
 #include <p3t_timer.h>
 #include <stdlib.h>
 
-#define SECONDS_PER_MINUTE 60
+#define SECONDS_PER_MINUTE (60)
+#define TARGET_SECONDS     (8 * SECONDS_PER_MINUTE)
 
 struct _p3t_timer {
 	int            number;
@@ -30,7 +31,7 @@ init (p3t_timer  *self,
       int         number)
 {
 	self->number = number;
-	self->targetSeconds = 8 * SECONDS_PER_MINUTE;
+	self->targetSeconds = TARGET_SECONDS;
 	self->state = P3T_TIMER_STATE_STOPPED;
 }
 
