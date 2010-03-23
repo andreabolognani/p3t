@@ -20,8 +20,7 @@ struct _p3t_timer {
 	p3t_timerState state;
 };
 
-void            p3t_timerInit        (p3t_timer  *timer,
-                                      int         number);
+p3t_timer*      p3t_timerNew         (int         number);
 
 int             p3t_timerGetNumber   (p3t_timer  *timer);
 p3t_timerState  p3t_timerGetState    (p3t_timer  *timer);

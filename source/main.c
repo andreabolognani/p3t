@@ -47,13 +47,13 @@ initScreen (void)
 int
 main (void)
 {
-	p3t_timer timer;
+	p3t_timer *timer;
 	int keys;
 
 	p3t_clockInit ();
 	initScreen ();
 
-	p3t_timerInit (&timer, 1);
+	timer = p3t_timerNew (1);
 
 	while (1) {
 
@@ -62,32 +62,32 @@ main (void)
 
 		if (keys & KEY_TOUCH) {
 
-			switch (p3t_timerGetState (&timer)) {
+			switch (p3t_timerGetState (timer)) {
 
 				case P3T_TIMER_STATE_STOPPED:
 
-					p3t_timerStart (&timer);
+					p3t_timerStart (timer);
 					printf ("[%d] Timer %d started\n",
 							p3t_clockGetSeconds (),
-							p3t_timerGetNumber (&timer));
+							p3t_timerGetNumber (timer));
 					break;
 
 				case P3T_TIMER_STATE_RUNNING:
 
-					p3t_timerPause (&timer);
+					p3t_timerPause (timer);
 					printf ("[%d] Timer %d paused, %d seconds elapsed\n",
 							p3t_clockGetSeconds (),
-							p3t_timerGetNumber (&timer),
-							p3t_timerGetElapsed (&timer));
+							p3t_timerGetNumber (timer),
+							p3t_timerGetElapsed (timer));
 					break;
 
 				case P3T_TIMER_STATE_PAUSED:
 
-					p3t_timerContinue (&timer);
+					p3t_timerContinue (timer);
 					printf ("[%d] Timer %d restarted, %d seconds elapsed\n",
 							p3t_clockGetSeconds (),
-							p3t_timerGetNumber (&timer),
-							p3t_timerGetElapsed (&timer));
+							p3t_timerGetNumber (timer),
+							p3t_timerGetElapsed (timer));
 					break;
 			}
 		}

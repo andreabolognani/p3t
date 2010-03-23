@@ -1,4 +1,5 @@
 #include <p3t_timer.h>
+#include <stdlib.h>
 
 #define SECONDS_PER_MINUTE 60
 
@@ -16,13 +17,24 @@ lastElapsed (p3t_timer *self)
 	return (p3t_clockGetSeconds () - self->startSeconds);
 }
 
-void
-p3t_timerInit (p3t_timer  *self,
-               int         number)
+static void
+init (p3t_timer  *self,
+      int         number)
 {
 	self->number = number;
 	self->time = 8 * SECONDS_PER_MINUTE;
 	self->state = P3T_TIMER_STATE_STOPPED;
+}
+
+p3t_timer*
+p3t_timerNew (int number)
+{
+	p3t_timer *self;
+
+	self = malloc (sizeof (p3t_timer));
+	init (self, number);
+
+	return self;
 }
 
 int
