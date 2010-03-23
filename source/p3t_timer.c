@@ -1,4 +1,5 @@
 #include <p3t_timer.h>
+#include <p3t_clock.h>
 #include <stdlib.h>
 
 #define SECONDS_PER_MINUTE (60)
