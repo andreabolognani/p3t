@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 #define SECONDS_PER_MINUTE (60)
-#define TARGET_SECONDS     (8 * SECONDS_PER_MINUTE)
+#define TARGET_SECONDS     (1 * SECONDS_PER_MINUTE)
 
 struct _p3t_timer {
 	int            number;
@@ -159,7 +159,7 @@ p3t_timerFinish (p3t_timer *self)
 	if (self->state != P3T_TIMER_STATE_RUNNING)
 		return;
 
-	self->elapsedSeconds += lastElapsed (self);
+	self->elapsedSeconds = 0;
 
 	self->state = P3T_TIMER_STATE_FINISHED;
 }

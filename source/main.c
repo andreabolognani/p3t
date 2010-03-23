@@ -3,6 +3,7 @@
 
 #include <p3t_clock.h>
 #include <p3t_timer.h>
+#include <p3t_application.h>
 
 #include <bgEight.h>
 #include <bgOne.h>
@@ -47,50 +48,20 @@ initScreen (void)
 int
 main (void)
 {
-	p3t_timer *timer;
+	p3t_application *application;
 	int keys;
 
 	p3t_clockInit ();
 	initScreen ();
 
-	timer = p3t_timerNew (1);
+	application = p3t_applicationNew ();
 
 	while (1) {
 
 		scanKeys ();
 		keys = keysDown ();
 
-		if (keys & KEY_TOUCH) {
-
-			switch (p3t_timerGetState (timer)) {
-
-				case P3T_TIMER_STATE_STOPPED:
-
-					p3t_timerStart (timer);
-					printf ("[%d] Timer %d started\n",
-							p3t_clockGetSeconds (),
-							p3t_timerGetNumber (timer));
-					break;
-
-				case P3T_TIMER_STATE_RUNNING:
-
-					p3t_timerPause (timer);
-					printf ("[%d] Timer %d paused, %d seconds elapsed\n",
-							p3t_clockGetSeconds (),
-							p3t_timerGetNumber (timer),
-							p3t_timerGetElapsed (timer));
-					break;
-
-				case P3T_TIMER_STATE_PAUSED:
-
-					p3t_timerContinue (timer);
-					printf ("[%d] Timer %d restarted, %d seconds elapsed\n",
-							p3t_clockGetSeconds (),
-							p3t_timerGetNumber (timer),
-							p3t_timerGetElapsed (timer));
-					break;
-			}
-		}
+		p3t_applicationUpdate (application, keys);
 
 		swiWaitForVBlank ();
 	}
