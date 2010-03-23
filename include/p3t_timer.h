@@ -24,7 +24,6 @@ void            p3t_timerDecreaseMinutes  (p3t_timer  *timer);
 
 void            p3t_timerStart            (p3t_timer  *timer);
 void            p3t_timerPause            (p3t_timer  *timer);
-void            p3t_timerContinue         (p3t_timer  *timer);
 void            p3t_timerStop             (p3t_timer  *timer);
 void            p3t_timerFinish           (p3t_timer  *timer);
 

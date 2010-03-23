@@ -48,6 +48,7 @@ p3t_applicationUpdate (p3t_application *self,
 		switch (p3t_timerGetState (self->timer)) {
 
 			case P3T_TIMER_STATE_STOPPED:
+			case P3T_TIMER_STATE_PAUSED:
 
 				p3t_timerStart (self->timer);
 				break;
@@ -55,11 +56,6 @@ p3t_applicationUpdate (p3t_application *self,
 			case P3T_TIMER_STATE_RUNNING:
 
 				p3t_timerPause (self->timer);
-				break;
-
-			case P3T_TIMER_STATE_PAUSED:
-
-				p3t_timerContinue (self->timer);
 				break;
 
 			case P3T_TIMER_STATE_FINISHED:

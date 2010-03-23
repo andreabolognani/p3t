@@ -118,17 +118,18 @@ p3t_timerDecreaseMinutes (p3t_timer *self)
 void
 p3t_timerStart (p3t_timer *self)
 {
-	if (self->state != P3T_TIMER_STATE_STOPPED)
+	if (self->state != P3T_TIMER_STATE_STOPPED &&
+	    self->state != P3T_TIMER_STATE_PAUSED)
 		return;
 
 	self->startSeconds = p3t_clockGetSeconds ();
-	self->elapsedSeconds = 0;
 
 	self->state = P3T_TIMER_STATE_RUNNING;
 
-	printf ("[%d %d] Started\n",
+	printf ("[%d %d] Started, %ds elapsed\n",
 			p3t_clockGetSeconds (),
-			p3t_timerGetNumber (self));
+			p3t_timerGetNumber (self),
+	        p3t_timerGetElapsed (self));
 }
 
 void
@@ -148,24 +149,10 @@ p3t_timerPause (p3t_timer *self)
 }
 
 void
-p3t_timerContinue (p3t_timer *self)
-{
-	if (self->state != P3T_TIMER_STATE_PAUSED)
-		return;
-
-	self->startSeconds = p3t_clockGetSeconds ();
-
-	self->state = P3T_TIMER_STATE_RUNNING;
-
-	printf ("[%d %d] Restarted, %ds elapsed\n",
-			p3t_clockGetSeconds (),
-			p3t_timerGetNumber (self),
-			p3t_timerGetElapsed (self));
-}
-
-void
 p3t_timerStop (p3t_timer *self)
 {
+	self->elapsedSeconds = 0;
+
 	self->state = P3T_TIMER_STATE_STOPPED;
 
 	printf ("[%d %d] Stopped\n",
