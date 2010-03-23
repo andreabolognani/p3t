@@ -54,10 +54,6 @@ main (void)
 	initScreen ();
 
 	p3t_timerInit (&timer, 1);
-	p3t_timerStart (&timer);
-	printf ("[%d] Timer %d started\n",
-	        p3t_clockGetSeconds (),
-	        p3t_timerGetNumber (&timer));
 
 	while (1) {
 
@@ -66,12 +62,34 @@ main (void)
 
 		if (keys & KEY_TOUCH) {
 
-			p3t_timerPause (&timer);
+			switch (p3t_timerGetState (&timer)) {
 
-			printf ("[%d] Timer %d paused, %d seconds elapsed\n",
-			        p3t_clockGetSeconds (),
-			        p3t_timerGetNumber (&timer),
-			        p3t_timerGetElapsed (&timer));
+				case P3T_TIMER_STATE_STOPPED:
+
+					p3t_timerStart (&timer);
+					printf ("[%d] Timer %d started\n",
+							p3t_clockGetSeconds (),
+							p3t_timerGetNumber (&timer));
+					break;
+
+				case P3T_TIMER_STATE_RUNNING:
+
+					p3t_timerPause (&timer);
+					printf ("[%d] Timer %d paused, %d seconds elapsed\n",
+							p3t_clockGetSeconds (),
+							p3t_timerGetNumber (&timer),
+							p3t_timerGetElapsed (&timer));
+					break;
+
+				case P3T_TIMER_STATE_PAUSED:
+
+					p3t_timerContinue (&timer);
+					printf ("[%d] Timer %d restarted, %d seconds elapsed\n",
+							p3t_clockGetSeconds (),
+							p3t_timerGetNumber (&timer),
+							p3t_timerGetElapsed (&timer));
+					break;
+			}
 		}
 
 		swiWaitForVBlank ();
