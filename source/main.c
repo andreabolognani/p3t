@@ -52,7 +52,7 @@ main (void)
 
 	p3t_clockInit ();
 	initScreen ();
-&&
+
 	p3t_timerInit (&timer, 1);
 	p3t_timerStart (&timer);
 	printf ("[%d] Timer %d started\n",
