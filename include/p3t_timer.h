@@ -12,14 +12,6 @@ typedef enum {
 	P3T_TIMER_STATE_FINISHED
 } p3t_timerState;
 
-struct _p3t_timer {
-	int            number;
-	int            time;
-	int            startSeconds;
-	int            elapsedSeconds;
-	p3t_timerState state;
-};
-
 p3t_timer*      p3t_timerNew         (int         number);
 
 int             p3t_timerGetNumber   (p3t_timer  *timer);

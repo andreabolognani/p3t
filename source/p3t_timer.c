@@ -3,6 +3,14 @@
 
 #define SECONDS_PER_MINUTE 60
 
+struct _p3t_timer {
+	int            number;
+	int            time;
+	int            startSeconds;
+	int            elapsedSeconds;
+	p3t_timerState state;
+};
+
 static int
 lastElapsed (p3t_timer *self)
 {
