@@ -5,7 +5,7 @@
 
 struct _p3t_timer {
 	int            number;
-	int            time;
+	int            targetSeconds;
 	int            startSeconds;
 	int            elapsedSeconds;
 	p3t_timerState state;
@@ -30,7 +30,7 @@ init (p3t_timer  *self,
       int         number)
 {
 	self->number = number;
-	self->time = 8 * SECONDS_PER_MINUTE;
+	self->targetSeconds = 8 * SECONDS_PER_MINUTE;
 	self->state = P3T_TIMER_STATE_STOPPED;
 }
 
@@ -61,6 +61,54 @@ int
 p3t_timerGetElapsed (p3t_timer *self)
 {
 	return (self->elapsedSeconds + lastElapsed (self));
+}
+
+int
+p3t_timerGetMinutes (p3t_timer *self)
+{
+	return (self->targetSeconds / SECONDS_PER_MINUTE);
+}
+
+void
+p3t_timerIncreaseMinutes (p3t_timer *self)
+{
+	/* Stop the timer if it's not stopped already */
+	if (self->state != P3T_TIMER_STATE_STOPPED) {
+		p3t_timerStop (self);
+	}
+
+	/* Round it down to the nearest minute, then add a minute */
+	self->targetSeconds -= (self->targetSeconds % SECONDS_PER_MINUTE);
+	self->targetSeconds += SECONDS_PER_MINUTE;
+
+	/* Don't go over 99 minutes */
+	if (self->targetSeconds >= (99 * SECONDS_PER_MINUTE)) {
+		self->targetSeconds = 99 * SECONDS_PER_MINUTE;
+	}
+}
+
+void
+p3t_timerDecreaseMinutes (p3t_timer *self)
+{
+	/* Stop the timer if it's not stopped already */
+	if (self->state != P3T_TIMER_STATE_STOPPED) {
+		p3t_timerStop (self);
+	}
+
+	/* Go from the middle of a minute to the start of that minute,
+	 * and from the beginning of a minute to the beginning of the
+	 * previous minute */
+	if ((self->targetSeconds % SECONDS_PER_MINUTE) > 0) {
+		self->targetSeconds -= (self->targetSeconds);
+	}
+	else {
+		self->targetSeconds -= SECONDS_PER_MINUTE;
+	}
+
+	/* Stop decreasing at 0 minutes */
+	if (self->targetSeconds <= 0) {
+		self->targetSeconds = 0;
+	}
 }
 
 void
