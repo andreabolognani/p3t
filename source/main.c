@@ -52,7 +52,7 @@ main (void)
 
 	p3t_clockInit ();
 	initScreen ();
-
+&&
 	p3t_timerInit (&timer, 1);
 	p3t_timerStart (&timer);
 	printf ("[%d] Timer %d started\n",
@@ -72,24 +72,9 @@ main (void)
 			        p3t_clockGetSeconds (),
 			        p3t_timerGetNumber (&timer),
 			        p3t_timerGetElapsed (&timer));
-
-			mode = !mode;
 		}
 
 		swiWaitForVBlank ();
-
-		switch (mode) {
-			case MODE_EIGHT:
-				dmaCopy (bgEightBitmap,
-						 (void *) videoBuffer,
-						 bgEightBitmapLen);
-				break;
-			case MODE_ONE:
-				dmaCopy (bgOneBitmap,
-						 (void *) videoBuffer,
-						 bgOneBitmapLen);
-				break;
-		}
 	}
 
 	return 0;
