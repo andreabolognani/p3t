@@ -29,6 +29,29 @@ lastElapsed (p3t_timer *self)
 	return (p3t_clockGetSeconds () - self->startSeconds);
 }
 
+static char*
+secondsAsString (int elapsed)
+{
+	char *asString;
+	int minutes;
+	int seconds;
+
+	asString = (char *) malloc (6 * sizeof (char));
+	asString[2] = ':';
+	asString[5] = '\0';
+
+	seconds = elapsed % SECONDS_PER_MINUTE;
+	minutes = (elapsed - seconds) / SECONDS_PER_MINUTE;
+
+	asString[1] = (minutes % 10) + 48;
+	asString[0] = ((minutes - (asString[1] - 48)) / 10) + 48;
+
+	asString[4] = (seconds % 10) + 48;
+	asString[3] = ((seconds - (asString[4] - 48)) / 10) + 48;
+
+	return asString;
+}
+
 static void
 init (p3t_timer  *self,
       int         number)
@@ -67,10 +90,22 @@ p3t_timerGetElapsed (p3t_timer *self)
 	return (self->elapsedSeconds + lastElapsed (self));
 }
 
+char*
+p3t_timerGetElapsedAsString (p3t_timer *self)
+{
+	return secondsAsString (p3t_timerGetElapsed (self));
+}
+
 int
 p3t_timerGetMinutes (p3t_timer *self)
 {
 	return (self->targetSeconds / SECONDS_PER_MINUTE);
+}
+
+char*
+p3t_timerGetMinutesAsString (p3t_timer *self)
+{
+	return secondsAsString (self->targetSeconds);
 }
 
 void
@@ -126,10 +161,11 @@ p3t_timerStart (p3t_timer *self)
 
 	self->state = P3T_TIMER_STATE_RUNNING;
 
-	printf ("[%d %d] Started, %ds elapsed\n",
+	printf ("[%d %d] Started (%s / %s)\n",
 			p3t_clockGetSeconds (),
 			p3t_timerGetNumber (self),
-	        p3t_timerGetElapsed (self));
+	        p3t_timerGetElapsedAsString (self),
+	        p3t_timerGetMinutesAsString (self));
 }
 
 void
@@ -142,10 +178,11 @@ p3t_timerPause (p3t_timer *self)
 
 	self->state = P3T_TIMER_STATE_PAUSED;
 
-	printf ("[%d %d] Paused, %ds elapsed\n",
+	printf ("[%d %d] Paused (%s / %s)\n",
 			p3t_clockGetSeconds (),
 			p3t_timerGetNumber (self),
-			p3t_timerGetElapsed (self));
+	        p3t_timerGetElapsedAsString (self),
+	        p3t_timerGetMinutesAsString (self));
 }
 
 void
@@ -170,7 +207,8 @@ p3t_timerFinish (p3t_timer *self)
 
 	self->state = P3T_TIMER_STATE_FINISHED;
 
-	printf ("[%d %d] Finished\n",
+	printf ("[%d %d] Finished (%s)\n",
 			p3t_clockGetSeconds (),
-			p3t_timerGetNumber (self));
+			p3t_timerGetNumber (self),
+	        p3t_timerGetMinutesAsString (self));
 }
