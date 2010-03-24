@@ -109,6 +109,19 @@ p3t_timerGetTargetTime (p3t_timer *self)
 	return secondsAsString (p3t_timerGetTargetSeconds (self));
 }
 
+int
+p3t_timerGetRemainingSeconds (p3t_timer *self)
+{
+	return (p3t_timerGetTargetSeconds (self) -
+	        p3t_timerGetElapsedSeconds (self));
+}
+
+char*
+p3t_timerGetRemainingTime (p3t_timer *self)
+{
+	return secondsAsString (p3t_timerGetRemainingSeconds (self));
+}
+
 void
 p3t_timerIncreaseTargetTime (p3t_timer *self)
 {
@@ -162,11 +175,10 @@ p3t_timerStart (p3t_timer *self)
 
 	self->state = P3T_TIMER_STATE_RUNNING;
 
-	printf ("[%d %d] Started (%s / %s)\n",
-			p3t_clockGetSeconds (),
-			p3t_timerGetNumber (self),
-	        p3t_timerGetElapsedTime (self),
-	        p3t_timerGetTargetTime (self));
+	printf ("[%d %d] Started (%s)\n",
+	        p3t_clockGetSeconds (),
+	        p3t_timerGetNumber (self),
+	        p3t_timerGetRemainingTime (self));
 }
 
 void
@@ -179,11 +191,10 @@ p3t_timerPause (p3t_timer *self)
 
 	self->state = P3T_TIMER_STATE_PAUSED;
 
-	printf ("[%d %d] Paused (%s / %s)\n",
-			p3t_clockGetSeconds (),
-			p3t_timerGetNumber (self),
-	        p3t_timerGetElapsedTime (self),
-	        p3t_timerGetTargetTime (self));
+	printf ("[%d %d] Paused (%s)\n",
+	        p3t_clockGetSeconds (),
+	        p3t_timerGetNumber (self),
+	        p3t_timerGetRemainingTime (self));
 }
 
 void
@@ -194,8 +205,8 @@ p3t_timerStop (p3t_timer *self)
 	self->state = P3T_TIMER_STATE_STOPPED;
 
 	printf ("[%d %d] Stopped\n",
-			p3t_clockGetSeconds (),
-			p3t_timerGetNumber (self));
+	        p3t_clockGetSeconds (),
+	        p3t_timerGetNumber (self));
 }
 
 void
@@ -209,7 +220,7 @@ p3t_timerFinish (p3t_timer *self)
 	self->state = P3T_TIMER_STATE_FINISHED;
 
 	printf ("[%d %d] Finished (%s)\n",
-			p3t_clockGetSeconds (),
-			p3t_timerGetNumber (self),
+	        p3t_clockGetSeconds (),
+	        p3t_timerGetNumber (self),
 	        p3t_timerGetTargetTime (self));
 }
