@@ -54,8 +54,8 @@ p3t_applicationUpdate (p3t_application *self,
 
 		timer = self->timers[i];
 
-		elapsed = p3t_timerGetElapsed (timer);
-		target = p3t_timerGetMinutes (timer) * SECONDS_PER_MINUTE;
+		elapsed = p3t_timerGetElapsedSeconds (timer);
+		target = p3t_timerGetTargetSeconds (timer);
 
 		if (elapsed >= target) {
 			p3t_timerFinish (timer);

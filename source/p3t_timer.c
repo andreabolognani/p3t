@@ -36,6 +36,7 @@ secondsAsString (int elapsed)
 	int minutes;
 	int seconds;
 
+	/* Assume the time is between 00:00 and 99:99 */
 	asString = (char *) malloc (6 * sizeof (char));
 	asString[2] = ':';
 	asString[5] = '\0';
@@ -85,31 +86,31 @@ p3t_timerGetState (p3t_timer *self)
 }
 
 int
-p3t_timerGetElapsed (p3t_timer *self)
+p3t_timerGetElapsedSeconds (p3t_timer *self)
 {
 	return (self->elapsedSeconds + lastElapsed (self));
 }
 
 char*
-p3t_timerGetElapsedAsString (p3t_timer *self)
+p3t_timerGetElapsedTime (p3t_timer *self)
 {
-	return secondsAsString (p3t_timerGetElapsed (self));
+	return secondsAsString (p3t_timerGetElapsedSeconds (self));
 }
 
 int
-p3t_timerGetMinutes (p3t_timer *self)
+p3t_timerGetTargetSeconds (p3t_timer *self)
 {
-	return (self->targetSeconds / SECONDS_PER_MINUTE);
+	return self->targetSeconds;
 }
 
 char*
-p3t_timerGetMinutesAsString (p3t_timer *self)
+p3t_timerGetTargetTime (p3t_timer *self)
 {
-	return secondsAsString (self->targetSeconds);
+	return secondsAsString (p3t_timerGetTargetSeconds (self));
 }
 
 void
-p3t_timerIncreaseMinutes (p3t_timer *self)
+p3t_timerIncreaseTargetTime (p3t_timer *self)
 {
 	/* Stop the timer if it's not stopped already */
 	if (self->state != P3T_TIMER_STATE_STOPPED) {
@@ -127,7 +128,7 @@ p3t_timerIncreaseMinutes (p3t_timer *self)
 }
 
 void
-p3t_timerDecreaseMinutes (p3t_timer *self)
+p3t_timerDecreaseTargetTime (p3t_timer *self)
 {
 	/* Stop the timer if it's not stopped already */
 	if (self->state != P3T_TIMER_STATE_STOPPED) {
@@ -164,8 +165,8 @@ p3t_timerStart (p3t_timer *self)
 	printf ("[%d %d] Started (%s / %s)\n",
 			p3t_clockGetSeconds (),
 			p3t_timerGetNumber (self),
-	        p3t_timerGetElapsedAsString (self),
-	        p3t_timerGetMinutesAsString (self));
+	        p3t_timerGetElapsedTime (self),
+	        p3t_timerGetTargetTime (self));
 }
 
 void
@@ -181,8 +182,8 @@ p3t_timerPause (p3t_timer *self)
 	printf ("[%d %d] Paused (%s / %s)\n",
 			p3t_clockGetSeconds (),
 			p3t_timerGetNumber (self),
-	        p3t_timerGetElapsedAsString (self),
-	        p3t_timerGetMinutesAsString (self));
+	        p3t_timerGetElapsedTime (self),
+	        p3t_timerGetTargetTime (self));
 }
 
 void
@@ -210,5 +211,5 @@ p3t_timerFinish (p3t_timer *self)
 	printf ("[%d %d] Finished (%s)\n",
 			p3t_clockGetSeconds (),
 			p3t_timerGetNumber (self),
-	        p3t_timerGetMinutesAsString (self));
+	        p3t_timerGetTargetTime (self));
 }
