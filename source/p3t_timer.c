@@ -5,7 +5,7 @@
 #include <stdio.h>
 
 #define SECONDS_PER_MINUTE (60)
-#define TARGET_SECONDS     (8 * SECONDS_PER_MINUTE)
+#define TARGET_SECONDS     (1 * SECONDS_PER_MINUTE)
 
 struct _p3t_timer {
 	int            number;
