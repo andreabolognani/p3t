@@ -6,14 +6,9 @@
 #include <p3t_application.h>
 
 #include <bgEight.h>
-#include <bgOne.h>
 
-enum mode_t {
-	MODE_EIGHT = 0,
-	MODE_ONE   = 1
-};
-
-volatile u16* videoBuffer;
+volatile u16* backgroundBuffer;
+volatile u16* widgetsBuffer;
 volatile mode_t mode;
 
 void
@@ -25,19 +20,26 @@ initScreen (void)
 	vramSetBankB (VRAM_B_MAIN_BG_0x06020000);
 
 	videoSetMode (MODE_5_2D |
+	              DISPLAY_BG2_ACTIVE |
 	              DISPLAY_BG3_ACTIVE);
 
 	BACKGROUND.control[3] = BG_BMP16_256x256 | BG_BMP_BASE (0);
+	BACKGROUND.control[2] = BG_BMP16_256x256 | BG_BMP_BASE (8);
 
 	BACKGROUND.bg3_rotation.xdy = 0;
 	BACKGROUND.bg3_rotation.xdx = 1 << 8;
 	BACKGROUND.bg3_rotation.ydy = 1 << 8;
 	BACKGROUND.bg3_rotation.ydx = 0;
+	BACKGROUND.bg2_rotation.xdy = 0;
+	BACKGROUND.bg2_rotation.xdx = 1 << 8;
+	BACKGROUND.bg2_rotation.ydy = 1 << 8;
+	BACKGROUND.bg2_rotation.ydx = 0;
 
-	videoBuffer = (u16*) BG_BMP_RAM (0);
+	backgroundBuffer = (u16*) BG_BMP_RAM (0);
+	widgetsBuffer = (u16*) BG_BMP_RAM (8);
 
 	dmaCopy (bgEightBitmap,
-			 (void *) videoBuffer,
+			 (void *) backgroundBuffer,
 			 bgEightBitmapLen);
 
 	consoleDemoInit ();
