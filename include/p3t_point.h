@@ -3,10 +3,11 @@
 
 typedef struct _p3t_point p3t_point;
 
-p3t_point* p3t_pointNew   (int         x,
-                           int         y);
+p3t_point*  p3t_pointNew      (int         x,
+                               int         y);
+void        p3t_pointDestroy  (p3t_point  *point);
 
-int        p3t_pointGetX  (p3t_point  *point);
-int        p3t_pointGetY  (p3t_point  *point);
+int         p3t_pointGetX     (p3t_point  *point);
+int         p3t_pointGetY     (p3t_point  *point);
 
 #endif /* __P3T_POINT_H__ */

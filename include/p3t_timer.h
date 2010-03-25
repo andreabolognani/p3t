@@ -13,6 +13,7 @@ typedef enum {
 } p3t_timerState;
 
 p3t_timer*      p3t_timerNew                  (int         number);
+void            p3t_timerDestroy              (p3t_timer  *timer);
 
 int             p3t_timerGetNumber            (p3t_timer  *timer);
 p3t_timerState  p3t_timerGetState             (p3t_timer  *timer);

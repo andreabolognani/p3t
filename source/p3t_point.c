@@ -16,6 +16,12 @@ init (p3t_point  *self,
 	self->y = y;
 }
 
+static void
+finalize (p3t_point *self)
+{
+	/* Nothing to do */
+}
+
 p3t_point*
 p3t_pointNew (int  x,
               int  y)
@@ -26,6 +32,13 @@ p3t_pointNew (int  x,
 	init (self, x, y);
 
 	return self;
+}
+
+void
+p3t_pointDestroy (p3t_point *self)
+{
+	finalize (self);
+	free (self);
 }
 
 int

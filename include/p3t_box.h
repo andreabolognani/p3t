@@ -9,6 +9,7 @@ p3t_box*  p3t_boxNew            (int       x,
                                  int       y,
                                  int       width,
                                  int       height);
+void      p3t_boxDestroy        (p3t_box  *box);
 
 int       p3t_boxGetX           (p3t_box  *box);
 int       p3t_boxGetY           (p3t_box  *box);

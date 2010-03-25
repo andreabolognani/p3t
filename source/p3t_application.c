@@ -43,6 +43,22 @@ init (p3t_application *self)
 	self->currentTimer = 0;
 }
 
+static void
+finalize (p3t_application *self)
+{
+	int i;
+
+	/* Destroy all timers and boxes */
+	for (i = 0; i < TIMERS_NUMBER; i++) {
+		p3t_timerDestroy (self->timers[i]);
+		p3t_boxDestroy (self->boxes[i]);
+	}
+
+	/* Destroy containers */
+	free (self->timers);
+	free (self->boxes);
+}
+
 p3t_application*
 p3t_applicationNew (void)
 {
@@ -52,6 +68,13 @@ p3t_applicationNew (void)
 	init (self);
 
 	return self;
+}
+
+void
+p3t_applicationDestroy (p3t_application *self)
+{
+	finalize (self);
+	free (self);
 }
 
 void
@@ -118,5 +141,7 @@ p3t_applicationUpdate (p3t_application *self,
 				}
 			}
 		}
+
+		p3t_pointDestroy (stylus);
 	}
 }

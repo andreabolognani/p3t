@@ -22,6 +22,12 @@ init (p3t_box  *self,
 	self->height = height;
 }
 
+static void
+finalize (p3t_box *self)
+{
+	/* Nothing to do */
+}
+
 p3t_box*
 p3t_boxNew (int  x,
             int  y,
@@ -34,6 +40,13 @@ p3t_boxNew (int  x,
 	init (self, x, y, width, height);
 
 	return self;
+}
+
+void
+p3t_boxDestroy (p3t_box *self)
+{
+	finalize (self);
+	free (self);
 }
 
 int

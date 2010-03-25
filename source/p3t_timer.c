@@ -62,6 +62,13 @@ init (p3t_timer  *self,
 	self->state = P3T_TIMER_STATE_STOPPED;
 }
 
+static void
+finalize (p3t_timer *self)
+{
+	/* Just to be sure */
+	p3t_timerStop (self);
+}
+
 p3t_timer*
 p3t_timerNew (int number)
 {
@@ -71,6 +78,13 @@ p3t_timerNew (int number)
 	init (self, number);
 
 	return self;
+}
+
+void
+p3t_timerDestroy (p3t_timer *self)
+{
+	finalize (self);
+	free (self);
 }
 
 int
