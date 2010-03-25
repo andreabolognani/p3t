@@ -18,5 +18,8 @@ int       p3t_boxGetHeight      (p3t_box  *box);
 
 int       p3t_boxContainsPoint  (p3t_box    *box,
                                  p3t_point  *point);
+int       p3t_boxContainsBox    (p3t_box    *box,
+                                 p3t_box    *anotherBox);
+
 
 #endif /* __P3T_BOX_H__ */
