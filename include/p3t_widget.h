@@ -4,6 +4,8 @@
 #include <p3t_point.h>
 #include <p3t_box.h>
 
+#define P3T_WIDGET(x) ((p3t_widget*) (x))
+
 typedef struct _p3t_widget p3t_widget;
 typedef struct _p3t_widgetPrivate p3t_widgetPrivate;
 
@@ -15,6 +17,8 @@ struct _p3t_widget {
 
 p3t_widget*  p3t_widgetNew                  (void);
 void         p3t_widgetDestroy              (p3t_widget  *widget);
+void         p3t_widgetInit                 (p3t_widget  *widget);
+void         p3t_widgetFinalize             (p3t_widget  *widget);
 
 void         p3t_widgetSetActivateCallback  (p3t_widget          *widget,
                                              p3t_widgetCallback   callback,

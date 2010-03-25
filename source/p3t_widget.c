@@ -8,8 +8,8 @@ struct _p3t_widgetPrivate {
 	void                *activateCallbackData;
 };
 
-static void
-init (p3t_widget *self)
+void
+p3t_widgetInit (p3t_widget *self)
 {
 	p3t_widgetPrivate *priv;
 
@@ -22,8 +22,8 @@ init (p3t_widget *self)
 	self->priv = priv;
 }
 
-static void
-finalize (p3t_widget *self)
+void
+p3t_widgetFinalize (p3t_widget *self)
 {
 	if (self->priv->box != NULL) {
 		p3t_boxDestroy (self->priv->box);
@@ -38,7 +38,7 @@ p3t_widgetNew (void)
 	p3t_widget *self;
 
 	self = (p3t_widget*) malloc (sizeof (p3t_widget));
-	init (self);
+	p3t_widgetInit (self);
 
 	return self;
 }
@@ -46,7 +46,7 @@ p3t_widgetNew (void)
 void
 p3t_widgetDestroy (p3t_widget *self)
 {
-	finalize (self);
+	p3t_widgetFinalize (self);
 	free (self);
 }
 
