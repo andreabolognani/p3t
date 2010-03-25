@@ -110,6 +110,35 @@ p3t_boxContainsBox (p3t_box  *self,
 	return 1;
 }
 
+void
+p3t_boxMakeAbsolute (p3t_box  *self,
+                     p3t_box  *container)
+{
+	/* If the box is not inside the container, assume it has
+	 * already been made absolute */
+	if (!p3t_boxContainsBox (container, self)) {
+		return;
+	}
+
+	/* Move the top left corner of the box */
+	self->x += p3t_boxGetX (container);
+	self->y += p3t_boxGetY (container);
+}
+
+void
+p3t_boxMakeRelative (p3t_box  *self,
+                     p3t_box  *container)
+{
+	/* It the box is already inside the container, assume it
+	 * has already been made relative */
+	if (p3t_boxContainsBox (container, self)) {
+		return;
+	}
+
+	self->x -= p3t_boxGetX (container);
+	self->y -= p3t_boxGetY (container);
+}
+
 int
 p3t_boxGetX (p3t_box *self)
 {
