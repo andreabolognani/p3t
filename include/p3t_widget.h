@@ -20,13 +20,17 @@ void         p3t_widgetDestroy              (p3t_widget  *widget);
 void         p3t_widgetInit                 (p3t_widget  *widget);
 void         p3t_widgetFinalize             (p3t_widget  *widget);
 
-void         p3t_widgetSetActivateCallback  (p3t_widget          *widget,
-                                             p3t_widgetCallback   callback,
-                                             void                *data);
+void         p3t_widgetPaint                (p3t_widget          *widget);
 void         p3t_widgetActivate             (p3t_widget          *widget);
 void         p3t_widgetTryActivate          (p3t_widget          *widget,
                                              p3t_point           *point);
 
+void         p3t_widgetSetPaintCallback     (p3t_widget          *widget,
+                                             p3t_widgetCallback   callback,
+                                             void                *data);
+void         p3t_widgetSetActivateCallback  (p3t_widget          *widget,
+                                             p3t_widgetCallback   callback,
+                                             void                *data);
 void         p3t_widgetSetBox               (p3t_widget  *widget,
                                              p3t_box     *box);
 p3t_box*     p3t_widgetGetBox               (p3t_widget  *widget);

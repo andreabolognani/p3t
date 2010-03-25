@@ -6,6 +6,8 @@ struct _p3t_widgetPrivate {
 	p3t_box             *box;
 	p3t_widgetCallback   activateCallback;
 	void                *activateCallbackData;
+	p3t_widgetCallback   paintCallback;
+	void                *paintCallbackData;
 };
 
 void
@@ -60,13 +62,22 @@ p3t_widgetSetActivateCallback (p3t_widget          *self,
 }
 
 void
+p3t_widgetSetPaintCallback (p3t_widget          *self,
+                            p3t_widgetCallback   callback,
+                            void                *data)
+{
+	self->priv->paintCallback = callback;
+	self->priv->paintCallbackData = data;
+}
+
+void
 p3t_widgetActivate (p3t_widget *self)
 {
 	p3t_widgetCallback activateCallback;
 
 	if (self->priv->activateCallback != NULL) {
 
-		activateCallback = (*(self->priv->activateCallback));
+		activateCallback = *(self->priv->activateCallback);
 		activateCallback (self, self->priv->activateCallbackData);
 	}
 }
@@ -77,6 +88,18 @@ p3t_widgetTryActivate (p3t_widget  *self,
 {
 	if (p3t_boxContainsPoint (self->priv->box, point)) {
 		p3t_widgetActivate (self);
+	}
+}
+
+void
+p3t_widgetPaint (p3t_widget *self)
+{
+	p3t_widgetCallback paintCallback;
+
+	if (self->priv->paintCallback != NULL) {
+
+		paintCallback = *(self->priv->paintCallback);
+		paintCallback (self, self->priv->paintCallbackData);
 	}
 }
 
