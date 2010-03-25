@@ -17,7 +17,7 @@ p3t_widget*  p3t_widgetNew                  (void);
 void         p3t_widgetDestroy              (p3t_widget  *widget);
 
 void         p3t_widgetSetActivateCallback  (p3t_widget          *widget,
-                                             p3t_widgetCallback  *callback,
+                                             p3t_widgetCallback   callback,
                                              void                *data);
 void         p3t_widgetActivate             (p3t_widget          *widget);
 void         p3t_widgetTryActivate          (p3t_widget          *widget,

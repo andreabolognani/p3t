@@ -4,7 +4,7 @@
 
 struct _p3t_widgetPrivate {
 	p3t_box             *box;
-	p3t_widgetCallback  *activateCallback;
+	p3t_widgetCallback   activateCallback;
 	void                *activateCallbackData;
 };
 
@@ -52,7 +52,7 @@ p3t_widgetDestroy (p3t_widget *self)
 
 void
 p3t_widgetSetActivateCallback (p3t_widget          *self,
-                               p3t_widgetCallback  *callback,
+                               p3t_widgetCallback   callback,
                                void                *data)
 {
 	self->priv->activateCallback = callback;
@@ -64,8 +64,11 @@ p3t_widgetActivate (p3t_widget *self)
 {
 	p3t_widgetCallback activateCallback;
 
-	activateCallback = (*(self->priv->activateCallback));
-	activateCallback (self, self->priv->activateCallbackData);
+	if (self->priv->activateCallback != NULL) {
+
+		activateCallback = (*(self->priv->activateCallback));
+		activateCallback (self, self->priv->activateCallbackData);
+	}
 }
 
 void
