@@ -10,7 +10,7 @@ struct _p3t_boxPrivate {
 };
 
 void
-p3t_boxInit (p3t_box  *self,
+_p3t_boxInit (p3t_box  *self,
              int       x,
              int       y,
              int       width,
@@ -29,7 +29,7 @@ p3t_boxInit (p3t_box  *self,
 }
 
 void
-p3t_boxFinalize (p3t_box *self)
+_p3t_boxFinalize (p3t_box *self)
 {
 	free (self->priv);
 }
@@ -43,7 +43,7 @@ p3t_boxNew (int  x,
 	p3t_box *self;
 
 	self = (p3t_box*) malloc (sizeof (p3t_box));
-	p3t_boxInit (self, x, y, width, height);
+	_p3t_boxInit (self, x, y, width, height);
 
 	return self;
 }
@@ -51,7 +51,7 @@ p3t_boxNew (int  x,
 void
 p3t_boxDestroy (p3t_box *self)
 {
-	p3t_boxFinalize (self);
+	_p3t_boxFinalize (self);
 	free (self);
 }
 

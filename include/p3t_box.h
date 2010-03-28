@@ -34,11 +34,11 @@ void      p3t_boxMakeAbsolute   (p3t_box    *box,
                                  p3t_box    *container);
 
 /* To be used only for inheritance */
-void      p3t_boxInit           (p3t_box  *box,
+void     _p3t_boxInit           (p3t_box  *box,
                                  int       x,
                                  int       y,
                                  int       width,
                                  int       height);
-void      p3t_boxFinalize       (p3t_box  *box);
+void     _p3t_boxFinalize       (p3t_box  *box);
 
 #endif /* __P3T_BOX_H__ */

@@ -25,11 +25,11 @@ void              p3t_timerWidgetSetTimer  (p3t_timerWidget  *timerWidget,
 p3t_timer*        p3t_timerWidgetGetTimer  (p3t_timerWidget  *timerWidget);
 
 /* To be used only for inheritance */
-void              p3t_timerWidgetInit      (p3t_timerWidget  *timerWidget,
+void             _p3t_timerWidgetInit      (p3t_timerWidget  *timerWidget,
                                             int               x,
                                             int               y,
                                             int               width,
                                             int               height);
-void              p3t_timerWidgetFinalize  (p3t_timerWidget  *timerWidget);
+void             _p3t_timerWidgetFinalize  (p3t_timerWidget  *timerWidget);
 
 #endif /* __P3T_TIMERWIDGET_H__ */

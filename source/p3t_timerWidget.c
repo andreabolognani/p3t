@@ -39,7 +39,7 @@ activateCallback (p3t_widget  *widget,
 }
 
 void
-p3t_timerWidgetInit (p3t_timerWidget  *self,
+_p3t_timerWidgetInit (p3t_timerWidget  *self,
                      int               x,
                      int               y,
                      int               width,
@@ -47,7 +47,7 @@ p3t_timerWidgetInit (p3t_timerWidget  *self,
 {
 	p3t_timerWidgetPrivate *priv;
 
-	p3t_widgetInit (P3T_WIDGET (self), x, y, width, height);
+	_p3t_widgetInit (P3T_WIDGET (self), x, y, width, height);
 
 	priv = malloc (sizeof (p3t_timerWidgetPrivate));
 
@@ -61,13 +61,13 @@ p3t_timerWidgetInit (p3t_timerWidget  *self,
 }
 
 void
-p3t_timerWidgetFinalize (p3t_timerWidget *self)
+_p3t_timerWidgetFinalize (p3t_timerWidget *self)
 {
 	if (self->priv->timer != NULL) {
 		p3t_timerDestroy (self->priv->timer);
 	}
 
-	p3t_widgetFinalize (P3T_WIDGET (self));
+	_p3t_widgetFinalize (P3T_WIDGET (self));
 }
 
 p3t_timerWidget*
@@ -79,7 +79,7 @@ p3t_timerWidgetNew (int  x,
 	p3t_timerWidget *self;
 
 	self = (p3t_timerWidget*) malloc (sizeof (p3t_timerWidget));
-	p3t_timerWidgetInit (self, x, y, width, height);
+	_p3t_timerWidgetInit (self, x, y, width, height);
 
 	return self;
 }
@@ -87,7 +87,7 @@ p3t_timerWidgetNew (int  x,
 void
 p3t_timerWidgetDestroy (p3t_timerWidget *self)
 {
-	p3t_timerWidgetFinalize (self);
+	_p3t_timerWidgetFinalize (self);
 	free (self);
 }
 

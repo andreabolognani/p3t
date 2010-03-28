@@ -10,7 +10,7 @@ struct _p3t_widgetPrivate {
 };
 
 void
-p3t_widgetInit (p3t_widget  *self,
+_p3t_widgetInit (p3t_widget  *self,
                 int          x,
                 int          y,
                 int          width,
@@ -18,7 +18,7 @@ p3t_widgetInit (p3t_widget  *self,
 {
 	p3t_widgetPrivate *priv;
 
-	p3t_boxInit (P3T_BOX (self), x, y, width, height);
+	_p3t_boxInit (P3T_BOX (self), x, y, width, height);
 
 	priv = (p3t_widgetPrivate*) malloc (sizeof (p3t_widgetPrivate));
 
@@ -31,11 +31,11 @@ p3t_widgetInit (p3t_widget  *self,
 }
 
 void
-p3t_widgetFinalize (p3t_widget *self)
+_p3t_widgetFinalize (p3t_widget *self)
 {
 	free (self->priv);
 
-	p3t_boxFinalize (P3T_BOX (self));
+	_p3t_boxFinalize (P3T_BOX (self));
 }
 
 p3t_widget*
@@ -47,7 +47,7 @@ p3t_widgetNew (int  x,
 	p3t_widget *self;
 
 	self = (p3t_widget*) malloc (sizeof (p3t_widget));
-	p3t_widgetInit (self, x, y, width, height);
+	_p3t_widgetInit (self, x, y, width, height);
 
 	return self;
 }
@@ -55,7 +55,7 @@ p3t_widgetNew (int  x,
 void
 p3t_widgetDestroy (p3t_widget *self)
 {
-	p3t_widgetFinalize (self);
+	_p3t_widgetFinalize (self);
 	free (self);
 }
 

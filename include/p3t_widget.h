@@ -35,11 +35,11 @@ void         p3t_widgetSetActivateCallback  (p3t_widget          *widget,
                                              void                *data);
 
 /* To be used only for inheritance */
-void         p3t_widgetInit                 (p3t_widget  *widget,
+void        _p3t_widgetInit                 (p3t_widget  *widget,
                                              int          x,
                                              int          y,
                                              int          width,
                                              int          height);
-void         p3t_widgetFinalize             (p3t_widget  *widget);
+void        _p3t_widgetFinalize             (p3t_widget  *widget);
 
 #endif /* __P3T_WIDGET_H__ */
