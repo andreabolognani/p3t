@@ -67,7 +67,7 @@ paintCallback (p3t_widget  *widget,
 	remaining = p3t_timerGetRemainingTime (timer);
 
 	box = p3t_boxNew (100, 5, 18, 34);
-	p3t_boxMakeAbsolute (box, p3t_widgetGetBox (P3T_WIDGET (self)));
+	p3t_boxMakeAbsolute (box, P3T_BOX (self));
 
 	paintBitmapInsideBox (application,
 	                      box,
@@ -121,30 +121,24 @@ init (p3t_application *self)
 	/* Create all the needed timers */
 	for (i = 0; i < TIMERS_NUMBER; i++) {
 		self->timers[i] = p3t_timerNew (i + 1);
-		self->widgets[i] = p3t_timerWidgetNew ();
-		p3t_timerWidgetSetTimer (self->widgets[i], self->timers[i]);
 	}
 
+	self->widgets[0] = p3t_timerWidgetNew (3, 3, 124, 45);
+	p3t_timerWidgetSetTimer (self->widgets[0], self->timers[0]);
 	p3t_widgetSetPaintCallback (P3T_WIDGET (self->widgets[0]),
 											&paintCallback,
 											self);
 
-	p3t_widgetSetBox (P3T_WIDGET (self->widgets[0]),
+	/*
 	                  p3t_boxNew (3, 3, 124, 45));
-	p3t_widgetSetBox (P3T_WIDGET (self->widgets[1]),
 	                  p3t_boxNew (3, 50, 124, 45));
-	p3t_widgetSetBox (P3T_WIDGET (self->widgets[2]),
 	                  p3t_boxNew (3, 97, 124, 45));
-	p3t_widgetSetBox (P3T_WIDGET (self->widgets[3]),
 	                  p3t_boxNew (3, 144, 124, 45));
-	p3t_widgetSetBox (P3T_WIDGET (self->widgets[4]),
 	                  p3t_boxNew (129, 3, 124, 45));
-	p3t_widgetSetBox (P3T_WIDGET (self->widgets[5]),
 	                  p3t_boxNew (129, 50, 124, 45));
-	p3t_widgetSetBox (P3T_WIDGET (self->widgets[6]),
 	                  p3t_boxNew (129, 97, 124, 45));
-	p3t_widgetSetBox (P3T_WIDGET (self->widgets[7]),
 	                  p3t_boxNew (129, 144, 124, 45));
+	*/
 }
 
 static void

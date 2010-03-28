@@ -3,7 +3,6 @@
 #include <stdlib.h>
 
 struct _p3t_widgetPrivate {
-	p3t_box             *box;
 	p3t_widgetCallback   activateCallback;
 	void                *activateCallbackData;
 	p3t_widgetCallback   paintCallback;
@@ -11,15 +10,22 @@ struct _p3t_widgetPrivate {
 };
 
 void
-p3t_widgetInit (p3t_widget *self)
+p3t_widgetInit (p3t_widget  *self,
+                int          x,
+                int          y,
+                int          width,
+                int          height)
 {
 	p3t_widgetPrivate *priv;
 
+	p3t_boxInit (P3T_BOX (self), x, y, width, height);
+
 	priv = (p3t_widgetPrivate*) malloc (sizeof (p3t_widgetPrivate));
 
-	priv->box = NULL;
 	priv->activateCallback = NULL;
 	priv->activateCallbackData = NULL;
+	priv->paintCallback = NULL;
+	priv->paintCallbackData = NULL;
 
 	self->priv = priv;
 }
@@ -27,20 +33,21 @@ p3t_widgetInit (p3t_widget *self)
 void
 p3t_widgetFinalize (p3t_widget *self)
 {
-	if (self->priv->box != NULL) {
-		p3t_boxDestroy (self->priv->box);
-	}
-
 	free (self->priv);
+
+	p3t_boxFinalize (P3T_BOX (self));
 }
 
 p3t_widget*
-p3t_widgetNew (void)
+p3t_widgetNew (int  x,
+               int  y,
+               int  width,
+               int  height)
 {
 	p3t_widget *self;
 
 	self = (p3t_widget*) malloc (sizeof (p3t_widget));
-	p3t_widgetInit (self);
+	p3t_widgetInit (self, x, y, width, height);
 
 	return self;
 }
@@ -86,7 +93,7 @@ void
 p3t_widgetTryActivate (p3t_widget  *self,
                        p3t_point   *point)
 {
-	if (p3t_boxContainsPoint (self->priv->box, point)) {
+	if (p3t_boxContainsPoint (P3T_BOX (self), point)) {
 		p3t_widgetActivate (self);
 	}
 }
@@ -101,21 +108,4 @@ p3t_widgetPaint (p3t_widget *self)
 		paintCallback = *(self->priv->paintCallback);
 		paintCallback (self, self->priv->paintCallbackData);
 	}
-}
-
-void
-p3t_widgetSetBox (p3t_widget  *self,
-                  p3t_box     *box)
-{
-	if (self->priv->box != NULL) {
-		p3t_boxDestroy (self->priv->box);
-	}
-
-	self->priv->box = box;
-}
-
-p3t_box*
-p3t_widgetGetBox (p3t_widget *self)
-{
-	return self->priv->box;
 }

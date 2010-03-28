@@ -1,5 +1,4 @@
 #include <p3t_timerWidget.h>
-#include <p3t_application.h>
 
 #include <stdlib.h>
 
@@ -40,11 +39,15 @@ activateCallback (p3t_widget  *widget,
 }
 
 void
-p3t_timerWidgetInit (p3t_timerWidget *self)
+p3t_timerWidgetInit (p3t_timerWidget  *self,
+                     int               x,
+                     int               y,
+                     int               width,
+                     int               height)
 {
 	p3t_timerWidgetPrivate *priv;
 
-	p3t_widgetInit (P3T_WIDGET (self));
+	p3t_widgetInit (P3T_WIDGET (self), x, y, width, height);
 
 	priv = malloc (sizeof (p3t_timerWidgetPrivate));
 
@@ -68,12 +71,15 @@ p3t_timerWidgetFinalize (p3t_timerWidget *self)
 }
 
 p3t_timerWidget*
-p3t_timerWidgetNew (void)
+p3t_timerWidgetNew (int  x,
+                    int  y,
+                    int  width,
+                    int  height)
 {
 	p3t_timerWidget *self;
 
-	self = malloc (sizeof (p3t_timerWidget));
-	p3t_timerWidgetInit (self);
+	self = (p3t_timerWidget*) malloc (sizeof (p3t_timerWidget));
+	p3t_timerWidgetInit (self, x, y, width, height);
 
 	return self;
 }
