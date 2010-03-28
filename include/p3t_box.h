@@ -3,7 +3,14 @@
 
 #include <p3t_point.h>
 
+#define P3T_BOX(x) ((p3t_box*) (x))
+
 typedef struct _p3t_box p3t_box;
+typedef struct _p3t_boxPrivate p3t_boxPrivate;
+
+struct _p3t_box {
+	p3t_boxPrivate *priv;
+};
 
 p3t_box*  p3t_boxNew            (int       x,
                                  int       y,
@@ -25,5 +32,13 @@ void      p3t_boxMakeRelative   (p3t_box    *box,
                                  p3t_box    *container);
 void      p3t_boxMakeAbsolute   (p3t_box    *box,
                                  p3t_box    *container);
+
+/* To be used only for inheritance */
+void      p3t_boxInit           (p3t_box  *box,
+                                 int       x,
+                                 int       y,
+                                 int       width,
+                                 int       height);
+void      p3t_boxFinalize       (p3t_box  *box);
 
 #endif /* __P3T_BOX_H__ */

@@ -2,30 +2,36 @@
 
 #include <stdlib.h>
 
-struct _p3t_box{
+struct _p3t_boxPrivate {
 	int  x;
 	int  y;
 	int  width;
 	int  height;
 };
 
-static void
-init (p3t_box  *self,
-      int       x,
-      int       y,
-      int       width,
-      int       height)
+void
+p3t_boxInit (p3t_box  *self,
+             int       x,
+             int       y,
+             int       width,
+             int       height)
 {
-	self->x = x;
-	self->y = y;
-	self->width = width;
-	self->height = height;
+	p3t_boxPrivate *priv;
+
+	priv = (p3t_boxPrivate*) malloc (sizeof (p3t_boxPrivate));
+
+	priv->x = x;
+	priv->y = y;
+	priv->width = width;
+	priv->height = height;
+
+	self->priv = priv;
 }
 
-static void
-finalize (p3t_box *self)
+void
+p3t_boxFinalize (p3t_box *self)
 {
-	/* Nothing to do */
+	free (self->priv);
 }
 
 p3t_box*
@@ -37,7 +43,7 @@ p3t_boxNew (int  x,
 	p3t_box *self;
 
 	self = (p3t_box*) malloc (sizeof (p3t_box));
-	init (self, x, y, width, height);
+	p3t_boxInit (self, x, y, width, height);
 
 	return self;
 }
@@ -45,7 +51,7 @@ p3t_boxNew (int  x,
 void
 p3t_boxDestroy (p3t_box *self)
 {
-	finalize (self);
+	p3t_boxFinalize (self);
 	free (self);
 }
 
@@ -115,38 +121,38 @@ p3t_boxMakeAbsolute (p3t_box  *self,
                      p3t_box  *container)
 {
 	/* Move the top left corner of the box */
-	self->x += p3t_boxGetX (container);
-	self->y += p3t_boxGetY (container);
+	self->priv->x += p3t_boxGetX (container);
+	self->priv->y += p3t_boxGetY (container);
 }
 
 void
 p3t_boxMakeRelative (p3t_box  *self,
                      p3t_box  *container)
 {
-	self->x -= p3t_boxGetX (container);
-	self->y -= p3t_boxGetY (container);
+	self->priv->x -= p3t_boxGetX (container);
+	self->priv->y -= p3t_boxGetY (container);
 }
 
 int
 p3t_boxGetX (p3t_box *self)
 {
-	return self->x;
+	return self->priv->x;
 }
 
 int
 p3t_boxGetY (p3t_box *self)
 {
-	return self->y;
+	return self->priv->y;
 }
 
 int
 p3t_boxGetWidth (p3t_box *self)
 {
-	return self->width;
+	return self->priv->width;
 }
 
 int
 p3t_boxGetHeight (p3t_box *self)
 {
-	return self->height;
+	return self->priv->height;
 }
