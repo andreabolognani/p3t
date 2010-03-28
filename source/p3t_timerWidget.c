@@ -1,4 +1,5 @@
 #include <p3t_timerWidget.h>
+#include <p3t_application.h>
 
 #include <stdlib.h>
 

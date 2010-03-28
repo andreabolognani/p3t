@@ -6,17 +6,77 @@
 #include <p3t_timerWidget.h>
 
 #include <stdlib.h>
-#include <stdio.h>
-
 #include <nds.h>
+
+#include <bgEight.h>
+#include <digit0.h>
 
 #define TIMERS_NUMBER      8
 #define SECONDS_PER_MINUTE 60
 
 struct _p3t_application {
+	u16               *backgroundBuffer;
+	u16               *widgetsBuffer;
 	p3t_timer        **timers;
 	p3t_timerWidget  **widgets;
 };
+
+static void
+paintBitmapInsideBox (p3t_application  *self,
+                      p3t_box          *box,
+                      u16              *bitmap,
+                      uint32            bitmapLen)
+{
+	u16 *video;
+	int bitmapLineLen;
+	int boxX;
+	int boxY;
+	int boxHeight;
+	int y;
+
+	boxX = p3t_boxGetX (box);
+	boxY = p3t_boxGetY (box);
+	boxHeight = p3t_boxGetHeight (box);
+
+	video = p3t_applicationGetWidgetsBuffer (self);
+	bitmapLineLen = bitmapLen / (boxHeight * 2);
+
+	DC_FlushRange (bitmap, bitmapLen);
+
+	for (y = 0; y < boxHeight; y++) {
+
+		dmaCopy ((void*) &bitmap[y * bitmapLineLen],
+		         (void*) &video[boxX + ((y + boxY) * SCREEN_WIDTH)],
+		         bitmapLen / boxHeight);
+	}
+}
+
+static void
+paintCallback (p3t_widget  *widget,
+               void        *data)
+{
+	p3t_timerWidget *self;
+	p3t_application *application;
+	p3t_timer *timer;
+	p3t_box *box;
+	char *remaining;
+
+	self = P3T_TIMERWIDGET (widget);
+	application = P3T_APPLICATION (data);
+	timer = p3t_timerWidgetGetTimer (self);
+	remaining = p3t_timerGetRemainingTime (timer);
+
+	box = p3t_boxNew (100, 5, 18, 34);
+	p3t_boxMakeAbsolute (box, p3t_widgetGetBox (P3T_WIDGET (self)));
+
+	paintBitmapInsideBox (application,
+	                      box,
+	                      (u16*) digit0Bitmap,
+	                      digit0BitmapLen);
+
+	p3t_boxDestroy (box);
+	free (remaining);
+}
 
 static void
 init (p3t_application *self)
@@ -64,6 +124,10 @@ init (p3t_application *self)
 		self->widgets[i] = p3t_timerWidgetNew ();
 		p3t_timerWidgetSetTimer (self->widgets[i], self->timers[i]);
 	}
+
+	p3t_widgetSetPaintCallback (P3T_WIDGET (self->widgets[0]),
+											&paintCallback,
+											self);
 
 	p3t_widgetSetBox (P3T_WIDGET (self->widgets[0]),
 	                  p3t_boxNew (3, 3, 124, 45));
@@ -152,4 +216,20 @@ p3t_applicationUpdate (p3t_application *self,
 
 		p3t_pointDestroy (stylus);
 	}
+
+	for (i = 0; i < TIMERS_NUMBER; i++) {
+		p3t_widgetPaint (P3T_WIDGET (self->widgets[i]));
+	}
+}
+
+u16*
+p3t_applicationGetBackgroundBuffer (p3t_application *self)
+{
+	return self->backgroundBuffer;
+}
+
+u16*
+p3t_applicationGetWidgetsBuffer (p3t_application *self)
+{
+	return self->widgetsBuffer;
 }
