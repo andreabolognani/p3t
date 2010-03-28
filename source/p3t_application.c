@@ -26,6 +26,38 @@ init (p3t_application *self)
 	self->timers = malloc (TIMERS_NUMBER * sizeof (p3t_timer *));
 	self->widgets = malloc (TIMERS_NUMBER * sizeof (p3t_timerWidget *));
 
+	powerOn (POWER_ALL_2D);
+
+	vramSetBankA (VRAM_A_MAIN_BG_0x06000000);
+	vramSetBankB (VRAM_B_MAIN_BG_0x06020000);
+
+	videoSetMode (MODE_5_2D |
+	              DISPLAY_BG2_ACTIVE |
+	              DISPLAY_BG3_ACTIVE);
+
+	BACKGROUND.control[3] = BG_BMP16_256x256 | BG_BMP_BASE (0);
+	BACKGROUND.control[2] = BG_BMP16_256x256 | BG_BMP_BASE (8);
+
+	BACKGROUND.bg3_rotation.xdy = 0;
+	BACKGROUND.bg3_rotation.xdx = 1 << 8;
+	BACKGROUND.bg3_rotation.ydy = 1 << 8;
+	BACKGROUND.bg3_rotation.ydx = 0;
+	BACKGROUND.bg2_rotation.xdy = 0;
+	BACKGROUND.bg2_rotation.xdx = 1 << 8;
+	BACKGROUND.bg2_rotation.ydy = 1 << 8;
+	BACKGROUND.bg2_rotation.ydx = 0;
+
+	self->backgroundBuffer = (u16*) BG_BMP_RAM (0);
+	self->widgetsBuffer = (u16*) BG_BMP_RAM (8);
+
+	dmaCopy((void*) bgEightBitmap,
+	        (void*) self->backgroundBuffer,
+	        bgEightBitmapLen);
+
+	consoleDemoInit ();
+
+	lcdMainOnBottom ();
+
 	/* Create all the needed timers */
 	for (i = 0; i < TIMERS_NUMBER; i++) {
 		self->timers[i] = p3t_timerNew (i + 1);
