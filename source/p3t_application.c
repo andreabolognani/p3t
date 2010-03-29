@@ -19,6 +19,7 @@
 #include <digit7.h>
 #include <digit8.h>
 #include <digit9.h>
+#include <blank.h>
 
 #define TIMERS_NUMBER      8
 #define SECONDS_PER_MINUTE 60
@@ -293,5 +294,8 @@ digitToBitmap (char    digit,
 			*bitmap = (u16*) digit9Bitmap;
 			*bitmapLen = digit9BitmapLen;
 			break;
+		default:
+			*bitmap = (u16*) blankBitmap;
+			*bitmapLen = blankBitmapLen;
 	}
 }
