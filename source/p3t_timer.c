@@ -2,10 +2,18 @@
 #include <p3t_clock.h>
 
 #include <stdlib.h>
-#include <stdio.h>
 
-#define SECONDS_PER_MINUTE (60)
-#define TARGET_SECONDS     (1 * SECONDS_PER_MINUTE)
+#ifdef DEVELOPMENT_BUILD
+#include <stdio.h>
+#endif
+
+#define SECONDS_PER_MINUTE  60
+
+#ifdef DEVELOPMENT_BUILD
+#define TARGET_SECONDS      (1 * SECONDS_PER_MINUTE)
+#else
+#define TARGET_SECONDS      (8 * SECONDS_PER_MINUTE)
+#endif
 
 struct _p3t_timer {
 	int            number;
@@ -189,10 +197,12 @@ p3t_timerStart (p3t_timer *self)
 
 	self->state = P3T_TIMER_STATE_RUNNING;
 
+#ifdef DEVELOPMENT_BUILD
 	printf ("[%d %d] Started (%s)\n",
 	        p3t_clockGetSeconds (),
 	        p3t_timerGetNumber (self),
 	        p3t_timerGetRemainingTime (self));
+#endif
 }
 
 void
@@ -205,10 +215,12 @@ p3t_timerPause (p3t_timer *self)
 
 	self->state = P3T_TIMER_STATE_PAUSED;
 
+#ifdef DEVELOPMENT_BUILD
 	printf ("[%d %d] Paused (%s)\n",
 	        p3t_clockGetSeconds (),
 	        p3t_timerGetNumber (self),
 	        p3t_timerGetRemainingTime (self));
+#endif
 }
 
 void
@@ -218,9 +230,11 @@ p3t_timerStop (p3t_timer *self)
 
 	self->state = P3T_TIMER_STATE_STOPPED;
 
+#ifdef DEVELOPMENT_BUILD
 	printf ("[%d %d] Stopped\n",
 	        p3t_clockGetSeconds (),
 	        p3t_timerGetNumber (self));
+#endif
 }
 
 void
@@ -233,8 +247,10 @@ p3t_timerFinish (p3t_timer *self)
 
 	self->state = P3T_TIMER_STATE_FINISHED;
 
+#ifdef DEVELOPMENT_BUILD
 	printf ("[%d %d] Finished (%s)\n",
 	        p3t_clockGetSeconds (),
 	        p3t_timerGetNumber (self),
 	        p3t_timerGetTargetTime (self));
+#endif
 }

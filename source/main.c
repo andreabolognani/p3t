@@ -3,6 +3,8 @@
 #include <p3t_clock.h>
 #include <p3t_application.h>
 
+#define DEVELOPMENT_BUILD
+
 int
 main (void)
 {

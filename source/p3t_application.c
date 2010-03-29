@@ -114,9 +114,11 @@ init (p3t_application *self)
 	        (void*) self->backgroundBuffer,
 	        bgEightBitmapLen);
 
-	consoleDemoInit ();
-
 	lcdMainOnBottom ();
+
+#ifdef DEVELOPMENT_BUILD
+	consoleDemoInit ();
+#endif
 
 	/* Create all the needed timers */
 	for (i = 0; i < TIMERS_NUMBER; i++) {
