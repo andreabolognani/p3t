@@ -10,6 +10,15 @@
 
 #include <bgEight.h>
 #include <digit0.h>
+#include <digit1.h>
+#include <digit2.h>
+#include <digit3.h>
+#include <digit4.h>
+#include <digit5.h>
+#include <digit6.h>
+#include <digit7.h>
+#include <digit8.h>
+#include <digit9.h>
 
 #define TIMERS_NUMBER      8
 #define SECONDS_PER_MINUTE 60
@@ -20,6 +29,10 @@ struct _p3t_application {
 	p3t_timer        **timers;
 	p3t_timerWidget  **widgets;
 };
+
+static void digitToBitmap (char    digit,
+                           u16   **bitmap,
+                           int    *bitmapLen);
 
 static void
 paintBitmapInsideBox (p3t_application  *self,
@@ -59,6 +72,8 @@ paintCallback (p3t_widget  *widget,
 	p3t_application *application;
 	p3t_timer *timer;
 	p3t_box *box;
+	u16 *bitmap;
+	int bitmapLen;
 	char *remaining;
 
 	self = P3T_TIMERWIDGET (widget);
@@ -69,10 +84,11 @@ paintCallback (p3t_widget  *widget,
 	box = p3t_boxNew (100, 5, 18, 34);
 	p3t_boxMakeAbsolute (box, P3T_BOX (self));
 
+	digitToBitmap (remaining[4], &bitmap, &bitmapLen);
 	paintBitmapInsideBox (application,
 	                      box,
-	                      (u16*) digit0Bitmap,
-	                      digit0BitmapLen);
+	                      bitmap,
+	                      bitmapLen);
 
 	p3t_boxDestroy (box);
 	free (remaining);
@@ -228,4 +244,54 @@ u16*
 p3t_applicationGetWidgetsBuffer (p3t_application *self)
 {
 	return self->widgetsBuffer;
+}
+
+/* Boring mapping stuff */
+static void
+digitToBitmap (char    digit,
+               u16   **bitmap,
+               int    *bitmapLen)
+{
+	switch (digit) {
+		case '0':
+			*bitmap = (u16*) digit0Bitmap;
+			*bitmapLen = digit0BitmapLen;
+			break;
+		case '1':
+			*bitmap = (u16*) digit1Bitmap;
+			*bitmapLen = digit1BitmapLen;
+			break;
+		case '2':
+			*bitmap = (u16*) digit2Bitmap;
+			*bitmapLen = digit2BitmapLen;
+			break;
+		case '3':
+			*bitmap = (u16*) digit3Bitmap;
+			*bitmapLen = digit3BitmapLen;
+			break;
+		case '4':
+			*bitmap = (u16*) digit4Bitmap;
+			*bitmapLen = digit4BitmapLen;
+			break;
+		case '5':
+			*bitmap = (u16*) digit5Bitmap;
+			*bitmapLen = digit5BitmapLen;
+			break;
+		case '6':
+			*bitmap = (u16*) digit6Bitmap;
+			*bitmapLen = digit6BitmapLen;
+			break;
+		case '7':
+			*bitmap = (u16*) digit7Bitmap;
+			*bitmapLen = digit7BitmapLen;
+			break;
+		case '8':
+			*bitmap = (u16*) digit8Bitmap;
+			*bitmapLen = digit8BitmapLen;
+			break;
+		case '9':
+			*bitmap = (u16*) digit9Bitmap;
+			*bitmapLen = digit9BitmapLen;
+			break;
+	}
 }
