@@ -82,6 +82,7 @@ paintCallback (p3t_widget  *widget,
 	timer = p3t_timerWidgetGetTimer (self);
 	remaining = p3t_timerGetRemainingTime (timer);
 
+	/* Last digit */
 	box = p3t_boxNew (100, 5, 18, 34);
 	p3t_boxMakeAbsolute (box, P3T_BOX (self));
 
@@ -92,6 +93,43 @@ paintCallback (p3t_widget  *widget,
 	                      bitmapLen);
 
 	p3t_boxDestroy (box);
+
+	/* Third digit */
+	box = p3t_boxNew (81, 5 ,18, 34);
+	p3t_boxMakeAbsolute (box, P3T_BOX (self));
+
+	digitToBitmap (remaining[3], &bitmap, &bitmapLen);
+	paintBitmapInsideBox (application,
+	                      box,
+	                      bitmap,
+	                      bitmapLen);
+
+	p3t_boxDestroy (box);
+
+	/* Second digit */
+	box = p3t_boxNew (55, 5 ,18, 34);
+	p3t_boxMakeAbsolute (box, P3T_BOX (self));
+
+	digitToBitmap (remaining[1], &bitmap, &bitmapLen);
+	paintBitmapInsideBox (application,
+	                      box,
+	                      bitmap,
+	                      bitmapLen);
+
+	p3t_boxDestroy (box);
+
+	/* First digit */
+	box = p3t_boxNew (36, 5 ,18, 34);
+	p3t_boxMakeAbsolute (box, P3T_BOX (self));
+
+	digitToBitmap (remaining[0], &bitmap, &bitmapLen);
+	paintBitmapInsideBox (application,
+	                      box,
+	                      bitmap,
+	                      bitmapLen);
+
+	p3t_boxDestroy (box);
+
 	free (remaining);
 }
 
@@ -131,33 +169,31 @@ init (p3t_application *self)
 	        (void*) self->backgroundBuffer,
 	        bgEightBitmapLen);
 
-	lcdMainOnBottom ();
-
 #ifdef DEVELOPMENT_BUILD
 	consoleDemoInit ();
 #endif
 
-	/* Create all the needed timers */
+	lcdMainOnBottom ();
+
+	/* Create all the widgets */
+	self->widgets[0] = p3t_timerWidgetNew (3, 3, 124, 45);
+	self->widgets[1] = p3t_timerWidgetNew (3, 50, 124, 45);
+	self->widgets[2] = p3t_timerWidgetNew (3, 97, 124, 45);
+	self->widgets[3] = p3t_timerWidgetNew (3, 144, 124, 45);
+	self->widgets[4] = p3t_timerWidgetNew (129, 3, 124, 45);
+	self->widgets[5] = p3t_timerWidgetNew (129, 50, 124, 45);
+	self->widgets[6] = p3t_timerWidgetNew (129, 97, 124, 45);
+	self->widgets[7] = p3t_timerWidgetNew (129, 144, 124, 45);
+
+	/* Create all the timers and assign each to its widget */
 	for (i = 0; i < TIMERS_NUMBER; i++) {
 		self->timers[i] = p3t_timerNew (i + 1);
+		p3t_timerWidgetSetTimer (self->widgets[i], self->timers[i]);
+		p3t_widgetSetPaintCallback (P3T_WIDGET (self->widgets[i]),
+												&paintCallback,
+												self);
 	}
 
-	self->widgets[0] = p3t_timerWidgetNew (3, 3, 124, 45);
-	p3t_timerWidgetSetTimer (self->widgets[0], self->timers[0]);
-	p3t_widgetSetPaintCallback (P3T_WIDGET (self->widgets[0]),
-											&paintCallback,
-											self);
-
-	/*
-	                  p3t_boxNew (3, 3, 124, 45));
-	                  p3t_boxNew (3, 50, 124, 45));
-	                  p3t_boxNew (3, 97, 124, 45));
-	                  p3t_boxNew (3, 144, 124, 45));
-	                  p3t_boxNew (129, 3, 124, 45));
-	                  p3t_boxNew (129, 50, 124, 45));
-	                  p3t_boxNew (129, 97, 124, 45));
-	                  p3t_boxNew (129, 144, 124, 45));
-	*/
 }
 
 static void
