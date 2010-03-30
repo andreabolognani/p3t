@@ -2,6 +2,7 @@
 #include <p3t_timer.h>
 #include <p3t_point.h>
 #include <p3t_box.h>
+#include <p3t_pixmap.h>
 #include <p3t_widget.h>
 #include <p3t_timerWidget.h>
 
@@ -10,17 +11,6 @@
 #include <maxmod9.h>
 
 #include <bgEight.h>
-#include <digit0.h>
-#include <digit1.h>
-#include <digit2.h>
-#include <digit3.h>
-#include <digit4.h>
-#include <digit5.h>
-#include <digit6.h>
-#include <digit7.h>
-#include <digit8.h>
-#include <digit9.h>
-#include <blank.h>
 #include <soundbank.h>
 #include <soundbank_bin.h>
 
@@ -34,40 +24,6 @@ struct _p3t_application {
 	p3t_timerWidget  **widgets;
 };
 
-static void digitToBitmap (char    digit,
-                           u16   **bitmap,
-                           int    *bitmapLen);
-
-static void
-paintBitmapInsideBox (p3t_application  *self,
-                      p3t_box          *box,
-                      u16              *bitmap,
-                      uint32            bitmapLen)
-{
-	u16 *video;
-	int bitmapLineLen;
-	int boxX;
-	int boxY;
-	int boxHeight;
-	int y;
-
-	boxX = p3t_boxGetX (box);
-	boxY = p3t_boxGetY (box);
-	boxHeight = p3t_boxGetHeight (box);
-
-	video = p3t_applicationGetWidgetsBuffer (self);
-	bitmapLineLen = bitmapLen / (boxHeight * 2);
-
-	DC_FlushRange (bitmap, bitmapLen);
-
-	for (y = 0; y < boxHeight; y++) {
-
-		dmaCopy ((void*) &bitmap[y * bitmapLineLen],
-		         (void*) &video[boxX + ((y + boxY) * SCREEN_WIDTH)],
-		         bitmapLen / boxHeight);
-	}
-}
-
 static void
 paintCallback (p3t_widget  *widget,
                void        *data)
@@ -75,9 +31,8 @@ paintCallback (p3t_widget  *widget,
 	p3t_timerWidget *self;
 	p3t_application *application;
 	p3t_timer *timer;
+	p3t_pixmap *pixmap;
 	p3t_box *box;
-	u16 *bitmap;
-	int bitmapLen;
 	char *remaining;
 
 	self = P3T_TIMERWIDGET (widget);
@@ -87,50 +42,42 @@ paintCallback (p3t_widget  *widget,
 
 	/* Last digit */
 	box = p3t_boxNew (100, 5, 18, 34);
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
+	                        remaining[4] - 48);
 	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-
-	digitToBitmap (remaining[4], &bitmap, &bitmapLen);
-	paintBitmapInsideBox (application,
-	                      box,
-	                      bitmap,
-	                      bitmapLen);
-
+	p3t_pixmapDraw (pixmap,
+	                box,
+	                p3t_applicationGetWidgetsBuffer (application));
 	p3t_boxDestroy (box);
 
 	/* Third digit */
 	box = p3t_boxNew (81, 5 ,18, 34);
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
+	                        remaining[3] - 48);
 	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-
-	digitToBitmap (remaining[3], &bitmap, &bitmapLen);
-	paintBitmapInsideBox (application,
-	                      box,
-	                      bitmap,
-	                      bitmapLen);
-
+	p3t_pixmapDraw (pixmap,
+	                box,
+	                p3t_applicationGetWidgetsBuffer (application));
 	p3t_boxDestroy (box);
 
 	/* Second digit */
 	box = p3t_boxNew (55, 5 ,18, 34);
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
+	                        remaining[1] - 48);
 	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-
-	digitToBitmap (remaining[1], &bitmap, &bitmapLen);
-	paintBitmapInsideBox (application,
-	                      box,
-	                      bitmap,
-	                      bitmapLen);
-
+	p3t_pixmapDraw (pixmap,
+	                box,
+	                p3t_applicationGetWidgetsBuffer (application));
 	p3t_boxDestroy (box);
 
 	/* First digit */
 	box = p3t_boxNew (36, 5 ,18, 34);
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
+	                        remaining[0] - 48);
 	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-
-	digitToBitmap (remaining[0], &bitmap, &bitmapLen);
-	paintBitmapInsideBox (application,
-	                      box,
-	                      bitmap,
-	                      bitmapLen);
-
+	p3t_pixmapDraw (pixmap,
+	                box,
+	                p3t_applicationGetWidgetsBuffer (application));
 	p3t_boxDestroy (box);
 
 	free (remaining);
@@ -285,57 +232,4 @@ u16*
 p3t_applicationGetWidgetsBuffer (p3t_application *self)
 {
 	return self->widgetsBuffer;
-}
-
-/* Boring mapping stuff */
-static void
-digitToBitmap (char    digit,
-               u16   **bitmap,
-               int    *bitmapLen)
-{
-	switch (digit) {
-		case '0':
-			*bitmap = (u16*) digit0Bitmap;
-			*bitmapLen = digit0BitmapLen;
-			break;
-		case '1':
-			*bitmap = (u16*) digit1Bitmap;
-			*bitmapLen = digit1BitmapLen;
-			break;
-		case '2':
-			*bitmap = (u16*) digit2Bitmap;
-			*bitmapLen = digit2BitmapLen;
-			break;
-		case '3':
-			*bitmap = (u16*) digit3Bitmap;
-			*bitmapLen = digit3BitmapLen;
-			break;
-		case '4':
-			*bitmap = (u16*) digit4Bitmap;
-			*bitmapLen = digit4BitmapLen;
-			break;
-		case '5':
-			*bitmap = (u16*) digit5Bitmap;
-			*bitmapLen = digit5BitmapLen;
-			break;
-		case '6':
-			*bitmap = (u16*) digit6Bitmap;
-			*bitmapLen = digit6BitmapLen;
-			break;
-		case '7':
-			*bitmap = (u16*) digit7Bitmap;
-			*bitmapLen = digit7BitmapLen;
-			break;
-		case '8':
-			*bitmap = (u16*) digit8Bitmap;
-			*bitmapLen = digit8BitmapLen;
-			break;
-		case '9':
-			*bitmap = (u16*) digit9Bitmap;
-			*bitmapLen = digit9BitmapLen;
-			break;
-		default:
-			*bitmap = (u16*) blankBitmap;
-			*bitmapLen = blankBitmapLen;
-	}
 }
