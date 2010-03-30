@@ -106,6 +106,7 @@ p3t_pixmapGet (p3t_pixmapType  type,
 
 	if (!ready) {
 		prepare ();
+		ready = 1;
 	}
 
 	self = pixmaps[type][identifier];
