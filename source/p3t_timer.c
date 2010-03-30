@@ -243,9 +243,9 @@ p3t_timerFinish (p3t_timer *self)
 	if (self->state != P3T_TIMER_STATE_RUNNING)
 		return;
 
-	self->elapsedSeconds = 0;
-
 	self->state = P3T_TIMER_STATE_FINISHED;
+
+	self->elapsedSeconds = self->targetSeconds;
 
 #ifdef DEVELOPMENT_BUILD
 	printf ("[%d %d] Finished (%s)\n",
