@@ -2,6 +2,9 @@
 #include <p3t_clock.h>
 
 #include <stdlib.h>
+#include <maxmod9.h>
+
+#include <soundbank.h>
 
 #ifdef DEVELOPMENT_BUILD
 #include <stdio.h>
@@ -16,11 +19,12 @@
 #endif
 
 struct _p3t_timer {
-	int            number;
-	int            targetSeconds;
-	int            startSeconds;
-	int            elapsedSeconds;
-	p3t_timerState state;
+	int             number;
+	int             targetSeconds;
+	int             startSeconds;
+	int             elapsedSeconds;
+	p3t_timerState  state;
+	mm_sfxhand      sfx;
 };
 
 static int
@@ -230,6 +234,9 @@ p3t_timerStop (p3t_timer *self)
 
 	self->state = P3T_TIMER_STATE_STOPPED;
 
+	mmEffectCancel (self->sfx);
+	mmEffectRelease (self->sfx);
+
 #ifdef DEVELOPMENT_BUILD
 	printf ("[%d %d] Stopped\n",
 	        p3t_clockGetSeconds (),
@@ -246,6 +253,9 @@ p3t_timerFinish (p3t_timer *self)
 	self->state = P3T_TIMER_STATE_FINISHED;
 
 	self->elapsedSeconds = self->targetSeconds;
+
+	mmLoadEffect (SFX_FINISH);
+	self->sfx = mmEffect (SFX_FINISH);
 
 #ifdef DEVELOPMENT_BUILD
 	printf ("[%d %d] Finished (%s)\n",

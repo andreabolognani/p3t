@@ -21,7 +21,6 @@
 #include <digit8.h>
 #include <digit9.h>
 #include <blank.h>
-
 #include <soundbank.h>
 #include <soundbank_bin.h>
 
@@ -199,8 +198,6 @@ init (p3t_application *self)
 												&paintCallback,
 												self);
 	}
-
-	mmLoadEffect (SFX_FINISH);
 }
 
 static void
@@ -254,9 +251,8 @@ p3t_applicationUpdate (p3t_application *self,
 		elapsed = p3t_timerGetElapsedSeconds (timer);
 		target = p3t_timerGetTargetSeconds (timer);
 
-		if (elapsed >= target && p3t_timerGetState (timer) == P3T_TIMER_STATE_RUNNING) {
+		if (elapsed >= target) {
 			p3t_timerFinish (timer);
-			mmEffect (SFX_FINISH);
 		}
 	}
 
