@@ -27,6 +27,10 @@ enum {
 	P3T_PIXMAP_DIGIT_9 = 9
 };
 
+enum {
+	P3T_PIXMAP_BACKGROUND_EIGHT = 0
+};
+
 struct _p3t_pixmap {
 	p3t_box             baseObject;
 	p3t_pixmapPrivate  *priv;

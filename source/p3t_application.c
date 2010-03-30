@@ -10,7 +10,6 @@
 #include <nds.h>
 #include <maxmod9.h>
 
-#include <bgEight.h>
 #include <soundbank.h>
 #include <soundbank_bin.h>
 
@@ -86,6 +85,8 @@ paintCallback (p3t_widget  *widget,
 static void
 init (p3t_application *self)
 {
+	p3t_pixmap *background;
+	p3t_box *screen;
 	int i;
 
 	self->timers = malloc (TIMERS_NUMBER * sizeof (p3t_timer *));
@@ -115,9 +116,13 @@ init (p3t_application *self)
 	self->backgroundBuffer = (u16*) BG_BMP_RAM (0);
 	self->widgetsBuffer = (u16*) BG_BMP_RAM (8);
 
-	dmaCopy((void*) bgEightBitmap,
-	        (void*) self->backgroundBuffer,
-	        bgEightBitmapLen);
+	/* Draw background */
+	screen = p3t_boxNew (0, 0, 256, 192);
+	background = p3t_pixmapGet (P3T_PIXMAP_TYPE_BACKGROUND,
+	                            P3T_PIXMAP_BACKGROUND_EIGHT);
+	p3t_pixmapDraw (background,
+	                screen,
+	                self->backgroundBuffer);
 
 #ifdef DEVELOPMENT_BUILD
 	consoleDemoInit ();
