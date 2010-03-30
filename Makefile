@@ -22,6 +22,7 @@ SOURCES		:=	source
 INCLUDES	:=	include
 DATA		:=	data  
 GRAPHICS	:=	gfx  
+AUDIO		:=  audio
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -42,7 +43,7 @@ LDFLAGS	=	-specs=ds_arm9.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project (order is important)
 #---------------------------------------------------------------------------------
-LIBS	:= 	-lnds9
+LIBS	:= 	-lnds9 -lmm9
  
  
 #---------------------------------------------------------------------------------
@@ -62,7 +63,8 @@ export OUTPUT	:=	$(CURDIR)/$(TARGET)
 
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(DATA),$(CURDIR)/$(dir)) \
-					$(foreach dir,$(GRAPHICS),$(CURDIR)/$(dir))
+					$(foreach dir,$(GRAPHICS),$(CURDIR)/$(dir)) \
+					$(foreach dir,$(AUDIO),$(CURDIR)/$(dir))
 
 export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 
@@ -70,7 +72,7 @@ CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 PNGFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.png)))
-BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
+BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*))) soundbank.bin
  
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -90,6 +92,8 @@ export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
 					$(PNGFILES:.png=.o) \
 					$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
  
+export AUDIOFILES := $(foreach dir,$(AUDIO),$(notdir $(wildcard $(dir)/*)))
+
 export INCLUDE	:=	$(foreach dir,$(INCLUDES), -I$(CURDIR)/$(dir)) \
 					$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
 					-I$(CURDIR)/$(BUILD)
@@ -142,6 +146,12 @@ $(OUTPUT).elf	:	$(OFILES)
 %.s %.h   : %.png %.grit
 #---------------------------------------------------------------------------------
 	grit $< -fts -o$*
+
+#-----
+# Create soundbank
+#-----
+soundbank.bin: $(AUDIOFILES)
+	mmutil -d $^ -osoundbank.bin -hsoundbank.h
 
 -include $(DEPSDIR)/*.d
  

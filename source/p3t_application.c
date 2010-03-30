@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <nds.h>
+#include <maxmod9.h>
 
 #include <bgEight.h>
 #include <digit0.h>
@@ -20,6 +21,9 @@
 #include <digit8.h>
 #include <digit9.h>
 #include <blank.h>
+
+#include <soundbank.h>
+#include <soundbank_bin.h>
 
 #define TIMERS_NUMBER      8
 #define SECONDS_PER_MINUTE 60
@@ -175,6 +179,8 @@ init (p3t_application *self)
 
 	lcdMainOnBottom ();
 
+	mmInitDefaultMem ((mm_addr) soundbank_bin);
+
 	/* Create all the widgets */
 	self->widgets[0] = p3t_timerWidgetNew (3, 3, 124, 45);
 	self->widgets[1] = p3t_timerWidgetNew (3, 50, 124, 45);
@@ -194,6 +200,7 @@ init (p3t_application *self)
 												self);
 	}
 
+	mmLoadEffect (SFX_FINISH);
 }
 
 static void
@@ -247,8 +254,9 @@ p3t_applicationUpdate (p3t_application *self,
 		elapsed = p3t_timerGetElapsedSeconds (timer);
 		target = p3t_timerGetTargetSeconds (timer);
 
-		if (elapsed >= target) {
+		if (elapsed >= target && p3t_timerGetState (timer) == P3T_TIMER_STATE_RUNNING) {
 			p3t_timerFinish (timer);
+			mmEffect (SFX_FINISH);
 		}
 	}
 
