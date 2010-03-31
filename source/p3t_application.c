@@ -39,6 +39,16 @@ paintCallback (p3t_widget  *widget,
 	timer = p3t_timerWidgetGetTimer (self);
 	remaining = p3t_timerGetRemainingTime (timer);
 
+	/* Timer number */
+	box = p3t_boxNew (5, 5, 18, 22);
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_NUMBER,
+	                        p3t_timerGetNumber (timer) - 1);
+	p3t_boxMakeAbsolute (box, P3T_BOX (self));
+	p3t_pixmapDraw (pixmap,
+	                box,
+	                p3t_applicationGetWidgetsBuffer (application));
+	p3t_boxDestroy (box);
+
 	/* Last digit */
 	box = p3t_boxNew (100, 5, 18, 34);
 	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,

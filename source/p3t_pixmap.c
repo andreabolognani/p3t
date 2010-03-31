@@ -14,15 +14,28 @@
 #include <digit8.h>
 #include <digit9.h>
 
+#include <number1.h>
+#include <number2.h>
+#include <number3.h>
+#include <number4.h>
+#include <number5.h>
+#include <number6.h>
+#include <number7.h>
+#include <number8.h>
+
 #include <bgEight.h>
 
-#define TYPES_NUMBER 2
+#define TYPES_NUMBER 3
 
 #define DIGITS_NUMBER      10
+#define NUMBERS_NUMBER     8
 #define BACKGROUNDS_NUMBER 1
 
 #define DIGIT_WIDTH  18
 #define DIGIT_HEIGHT 34
+
+#define NUMBER_WIDTH  18
+#define NUMBER_HEIGHT 22
 
 #define BACKGROUND_WIDTH  256
 #define BACKGROUND_HEIGHT 192
@@ -38,7 +51,9 @@ static p3t_pixmap  ***pixmaps;
 
 static int ready = 0;
 
+/* Mapping functions */
 static u16* digitFromIdentifier      (int identifier);
+static u16* numberFromIdentifier     (int identifier);
 static u16* backgroundFromIdentifier (int identifier);
 
 static void
@@ -56,6 +71,14 @@ prepare (void)
 
 	for (i = 0; i < DIGITS_NUMBER; i++) {
 		pixmaps[P3T_PIXMAP_TYPE_DIGIT][i] = NULL;
+	}
+
+	widths[P3T_PIXMAP_TYPE_NUMBER] = NUMBER_WIDTH;
+	heights[P3T_PIXMAP_TYPE_NUMBER] = NUMBER_HEIGHT;
+	pixmaps[P3T_PIXMAP_TYPE_NUMBER] = (p3t_pixmap**) malloc (NUMBERS_NUMBER * sizeof (p3t_pixmap*));
+
+	for (i = 0; i < NUMBERS_NUMBER; i++) {
+		pixmaps[P3T_PIXMAP_TYPE_NUMBER][i] = NULL;
 	}
 
 	widths[P3T_PIXMAP_TYPE_BACKGROUND] = BACKGROUND_WIDTH;
@@ -84,6 +107,11 @@ _p3t_pixmapInit (p3t_pixmap      *self,
 		case P3T_PIXMAP_TYPE_DIGIT:
 
 			priv->data = digitFromIdentifier (identifier);
+			break;
+
+		case P3T_PIXMAP_TYPE_NUMBER:
+
+			priv->data = numberFromIdentifier (identifier);
 			break;
 
 		case P3T_PIXMAP_TYPE_BACKGROUND:
@@ -192,6 +220,49 @@ digitFromIdentifier (int identifier)
 
 		case P3T_PIXMAP_DIGIT_9:
 			data = (u16*) digit9Bitmap;
+			break;
+	}
+
+	return data;
+}
+
+static u16*
+numberFromIdentifier (int identifier)
+{
+	u16* data;
+
+	switch (identifier) {
+
+		case P3T_PIXMAP_NUMBER_1:
+			data = (u16*) number1Bitmap;
+			break;
+
+		case P3T_PIXMAP_NUMBER_2:
+			data = (u16*) number2Bitmap;
+			break;
+
+		case P3T_PIXMAP_NUMBER_3:
+			data = (u16*) number3Bitmap;
+			break;
+
+		case P3T_PIXMAP_NUMBER_4:
+			data = (u16*) number4Bitmap;
+			break;
+
+		case P3T_PIXMAP_NUMBER_5:
+			data = (u16*) number5Bitmap;
+			break;
+
+		case P3T_PIXMAP_NUMBER_6:
+			data = (u16*) number6Bitmap;
+			break;
+
+		case P3T_PIXMAP_NUMBER_7:
+			data = (u16*) number7Bitmap;
+			break;
+
+		case P3T_PIXMAP_NUMBER_8:
+			data = (u16*) number8Bitmap;
 			break;
 	}
 
