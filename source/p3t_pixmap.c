@@ -23,12 +23,15 @@
 #include <number7.h>
 #include <number8.h>
 
+#include <outlineTimerWidget.h>
+
 #include <bgEight.h>
 
-#define TYPES_NUMBER 3
+#define TYPES_NUMBER 4
 
 #define DIGITS_NUMBER      10
 #define NUMBERS_NUMBER     8
+#define OUTLINES_NUMBER    1
 #define BACKGROUNDS_NUMBER 1
 
 #define DIGIT_WIDTH  18
@@ -45,44 +48,57 @@ struct _p3t_pixmapPrivate {
 	u16             *data;
 };
 
-static int           *widths;
-static int           *heights;
 static p3t_pixmap  ***pixmaps;
 
 static int ready = 0;
 
 /* Mapping functions */
-static u16* digitFromIdentifier      (int identifier);
-static u16* numberFromIdentifier     (int identifier);
-static u16* backgroundFromIdentifier (int identifier);
+static void  digitInfo       (int    identifier,
+                              u16  **data,
+                              int   *width,
+                              int   *height);
+static void  numberInfo      (int    identifier,
+                              u16  **data,
+                              int   *width,
+                              int   *height);
+static void  outlineInfo     (int    identifier,
+                              u16  **data,
+                              int   *width,
+                              int   *height);
+static void  backgroundInfo  (int    identifier,
+                              u16  **data,
+                              int   *width,
+                              int   *height);
 
 static void
 prepare (void)
 {
 	int i;
 
-	widths = (int*) malloc (TYPES_NUMBER * sizeof (int));
-	heights = (int*) malloc (TYPES_NUMBER * sizeof (int));
 	pixmaps = (p3t_pixmap***) malloc (TYPES_NUMBER * sizeof (p3t_pixmap**));
 
-	widths[P3T_PIXMAP_TYPE_DIGIT] = DIGIT_WIDTH;
-	heights[P3T_PIXMAP_TYPE_DIGIT] = DIGIT_HEIGHT;
+	/* Digits */
 	pixmaps[P3T_PIXMAP_TYPE_DIGIT] = (p3t_pixmap**) malloc (DIGITS_NUMBER * sizeof (p3t_pixmap*));
 
 	for (i = 0; i < DIGITS_NUMBER; i++) {
 		pixmaps[P3T_PIXMAP_TYPE_DIGIT][i] = NULL;
 	}
 
-	widths[P3T_PIXMAP_TYPE_NUMBER] = NUMBER_WIDTH;
-	heights[P3T_PIXMAP_TYPE_NUMBER] = NUMBER_HEIGHT;
+	/* Numbers */
 	pixmaps[P3T_PIXMAP_TYPE_NUMBER] = (p3t_pixmap**) malloc (NUMBERS_NUMBER * sizeof (p3t_pixmap*));
 
 	for (i = 0; i < NUMBERS_NUMBER; i++) {
 		pixmaps[P3T_PIXMAP_TYPE_NUMBER][i] = NULL;
 	}
 
-	widths[P3T_PIXMAP_TYPE_BACKGROUND] = BACKGROUND_WIDTH;
-	heights[P3T_PIXMAP_TYPE_BACKGROUND] = BACKGROUND_HEIGHT;
+	/* Outlines */
+	pixmaps[P3T_PIXMAP_TYPE_OUTLINE] = (p3t_pixmap**) malloc (OUTLINES_NUMBER * sizeof (p3t_pixmap*));
+
+	for (i = 0; i < OUTLINES_NUMBER; i++) {
+		pixmaps[P3T_PIXMAP_TYPE_OUTLINE][i] = NULL;
+	}
+
+	/* Backgrounds */
 	pixmaps[P3T_PIXMAP_TYPE_BACKGROUND] = (p3t_pixmap**) malloc (BACKGROUNDS_NUMBER * sizeof (p3t_pixmap*));
 
 	for (i = 0; i < BACKGROUNDS_NUMBER; i++) {
@@ -96,29 +112,39 @@ _p3t_pixmapInit (p3t_pixmap      *self,
                  int              identifier)
 {
 	p3t_pixmapPrivate *priv;
-
-	_p3t_boxInit (P3T_BOX (self), 0, 0, widths[type], heights[type]);
-
-	priv = (p3t_pixmapPrivate*) malloc (sizeof (p3t_pixmapPrivate));
+	u16 *data;
+	int width;
+	int height;
 
 	/* Boring switch stuff */
 	switch (type) {
 
 		case P3T_PIXMAP_TYPE_DIGIT:
 
-			priv->data = digitFromIdentifier (identifier);
+			digitInfo (identifier, &data, &width, &height);
 			break;
 
 		case P3T_PIXMAP_TYPE_NUMBER:
 
-			priv->data = numberFromIdentifier (identifier);
+			numberInfo (identifier, &data, &width, &height);
+			break;
+
+		case P3T_PIXMAP_TYPE_OUTLINE:
+
+			outlineInfo (identifier, &data, &width, &height);
 			break;
 
 		case P3T_PIXMAP_TYPE_BACKGROUND:
 
-			priv->data = backgroundFromIdentifier (identifier);
+			backgroundInfo (identifier, &data, &width, &height);
 			break;
 	}
+
+	_p3t_boxInit (P3T_BOX (self), 0, 0, width, height);
+
+	priv = (p3t_pixmapPrivate*) malloc (sizeof (p3t_pixmapPrivate));
+
+	priv->data = data;
 
 	self->priv = priv;
 
@@ -175,111 +201,134 @@ p3t_pixmapDraw (p3t_pixmap  *self,
 	}
 }
 
-static u16*
-digitFromIdentifier (int identifier)
+static void
+digitInfo (int    identifier,
+           u16  **data,
+           int   *width,
+           int   *height)
 {
-	u16 *data;
+	*width = DIGIT_WIDTH;
+	*height = DIGIT_HEIGHT;
 
 	switch (identifier) {
 
 		case P3T_PIXMAP_DIGIT_0:
-			data = (u16*) digit0Bitmap;
+			*data = (u16*) digit0Bitmap;
 			break;
 
 		case P3T_PIXMAP_DIGIT_1:
-			data = (u16*) digit1Bitmap;
+			*data = (u16*) digit1Bitmap;
 			break;
 
 		case P3T_PIXMAP_DIGIT_2:
-			data = (u16*) digit2Bitmap;
+			*data = (u16*) digit2Bitmap;
 			break;
 
 		case P3T_PIXMAP_DIGIT_3:
-			data = (u16*) digit3Bitmap;
+			*data = (u16*) digit3Bitmap;
 			break;
 
 		case P3T_PIXMAP_DIGIT_4:
-			data = (u16*) digit4Bitmap;
+			*data = (u16*) digit4Bitmap;
 			break;
 
 		case P3T_PIXMAP_DIGIT_5:
-			data = (u16*) digit5Bitmap;
+			*data = (u16*) digit5Bitmap;
 			break;
 
 		case P3T_PIXMAP_DIGIT_6:
-			data = (u16*) digit6Bitmap;
+			*data = (u16*) digit6Bitmap;
 			break;
 
 		case P3T_PIXMAP_DIGIT_7:
-			data = (u16*) digit7Bitmap;
+			*data = (u16*) digit7Bitmap;
 			break;
 
 		case P3T_PIXMAP_DIGIT_8:
-			data = (u16*) digit8Bitmap;
+			*data = (u16*) digit8Bitmap;
 			break;
 
 		case P3T_PIXMAP_DIGIT_9:
-			data = (u16*) digit9Bitmap;
+			*data = (u16*) digit9Bitmap;
 			break;
 	}
-
-	return data;
 }
 
-static u16*
-numberFromIdentifier (int identifier)
+static void
+numberInfo (int     identifier,
+            u16   **data,
+            int    *width,
+            int    *height)
 {
-	u16* data;
+	*width = NUMBER_WIDTH;
+	*height = NUMBER_HEIGHT;
 
 	switch (identifier) {
 
 		case P3T_PIXMAP_NUMBER_1:
-			data = (u16*) number1Bitmap;
+			*data = (u16*) number1Bitmap;
 			break;
 
 		case P3T_PIXMAP_NUMBER_2:
-			data = (u16*) number2Bitmap;
+			*data = (u16*) number2Bitmap;
 			break;
 
 		case P3T_PIXMAP_NUMBER_3:
-			data = (u16*) number3Bitmap;
+			*data = (u16*) number3Bitmap;
 			break;
 
 		case P3T_PIXMAP_NUMBER_4:
-			data = (u16*) number4Bitmap;
+			*data = (u16*) number4Bitmap;
 			break;
 
 		case P3T_PIXMAP_NUMBER_5:
-			data = (u16*) number5Bitmap;
+			*data = (u16*) number5Bitmap;
 			break;
 
 		case P3T_PIXMAP_NUMBER_6:
-			data = (u16*) number6Bitmap;
+			*data = (u16*) number6Bitmap;
 			break;
 
 		case P3T_PIXMAP_NUMBER_7:
-			data = (u16*) number7Bitmap;
+			*data = (u16*) number7Bitmap;
 			break;
 
 		case P3T_PIXMAP_NUMBER_8:
-			data = (u16*) number8Bitmap;
+			*data = (u16*) number8Bitmap;
 			break;
 	}
-
-	return data;
 }
 
-static u16*
-backgroundFromIdentifier (int identifier)
+static void
+outlineInfo (int    identifier,
+             u16  **data,
+             int   *width,
+             int   *height)
 {
-	u16 *data;
+	switch (identifier) {
+
+		case P3T_PIXMAP_OUTLINE_TIMERWIDGET:
+
+			*width = 124;
+			*height = 45;
+			*data = (u16*) outlineTimerWidgetBitmap;
+			break;
+	}
+}
+
+static void
+backgroundInfo (int     identifier,
+                u16   **data,
+                int    *width,
+                int    *height)
+{
+	*width = BACKGROUND_WIDTH;
+	*height = BACKGROUND_HEIGHT;
 
 	switch (identifier) {
 
 		case P3T_PIXMAP_BACKGROUND_EIGHT:
-			data = (u16*) bgEightBitmap;
+			*data = (u16*) bgEightBitmap;
 			break;
 	}
-
-	return data;
 }

@@ -12,6 +12,7 @@ typedef struct _p3t_pixmapPrivate p3t_pixmapPrivate;
 typedef enum {
 	P3T_PIXMAP_TYPE_DIGIT,
 	P3T_PIXMAP_TYPE_NUMBER,
+	P3T_PIXMAP_TYPE_OUTLINE,
 	P3T_PIXMAP_TYPE_BACKGROUND
 } p3t_pixmapType;
 
@@ -37,6 +38,10 @@ enum {
 	P3T_PIXMAP_NUMBER_6,
 	P3T_PIXMAP_NUMBER_7,
 	P3T_PIXMAP_NUMBER_8
+};
+
+enum {
+	P3T_PIXMAP_OUTLINE_TIMERWIDGET
 };
 
 enum {
