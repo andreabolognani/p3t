@@ -24,6 +24,38 @@ struct _p3t_application {
 };
 
 static void
+activateCallback (p3t_widget  *widget,
+                  void        *data)
+{
+	p3t_timerWidget *self;
+	p3t_timer *timer;
+
+	self = P3T_TIMERWIDGET (widget);
+	timer = p3t_timerWidgetGetTimer (self);
+
+	if (timer != NULL) {
+		switch (p3t_timerGetState (timer)) {
+
+			case P3T_TIMER_STATE_STOPPED:
+			case P3T_TIMER_STATE_PAUSED:
+
+				p3t_timerStart (timer);
+				break;
+
+			case P3T_TIMER_STATE_RUNNING:
+
+				p3t_timerPause (timer);
+				break;
+
+			case P3T_TIMER_STATE_FINISHED:
+
+				p3t_timerStop (timer);
+				break;
+		}
+	}
+}
+
+static void
 paintCallback (p3t_widget  *widget,
                void        *data)
 {
@@ -156,9 +188,13 @@ init (p3t_application *self)
 	for (i = 0; i < TIMERS_NUMBER; i++) {
 		self->timers[i] = p3t_timerNew (i + 1);
 		p3t_timerWidgetSetTimer (self->widgets[i], self->timers[i]);
+
 		p3t_widgetSetPaintCallback (P3T_WIDGET (self->widgets[i]),
-												&paintCallback,
-												self);
+		                            &paintCallback,
+		                            self);
+		p3t_widgetSetActivateCallback (P3T_WIDGET (self->widgets[i]),
+		                               &activateCallback,
+		                               NULL);
 	}
 }
 

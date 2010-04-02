@@ -6,38 +6,6 @@ struct _p3t_timerWidgetPrivate {
 	p3t_timer  *timer;
 };
 
-static void
-activateCallback (p3t_widget  *widget,
-                  void        *data)
-{
-	p3t_timerWidget *self;
-	p3t_timer *timer;
-
-	self = P3T_TIMERWIDGET (widget);
-	timer = p3t_timerWidgetGetTimer (self);
-
-	if (timer != NULL) {
-		switch (p3t_timerGetState (timer)) {
-
-			case P3T_TIMER_STATE_STOPPED:
-			case P3T_TIMER_STATE_PAUSED:
-
-				p3t_timerStart (timer);
-				break;
-
-			case P3T_TIMER_STATE_RUNNING:
-
-				p3t_timerPause (timer);
-				break;
-
-			case P3T_TIMER_STATE_FINISHED:
-
-				p3t_timerStop (timer);
-				break;
-		}
-	}
-}
-
 void
 _p3t_timerWidgetInit (p3t_timerWidget  *self,
                      int               x,
@@ -54,10 +22,6 @@ _p3t_timerWidgetInit (p3t_timerWidget  *self,
 	priv->timer = NULL;
 
 	self->priv = priv;
-
-	p3t_widgetSetActivateCallback (P3T_WIDGET (self),
-	                               activateCallback,
-	                               NULL);
 }
 
 void
