@@ -7,6 +7,8 @@ struct _p3t_boxPrivate {
 	int  y;
 	int  width;
 	int  height;
+	int  savedX;
+	int  savedY;
 };
 
 void
@@ -24,6 +26,8 @@ _p3t_boxInit (p3t_box  *self,
 	priv->y = y;
 	priv->width = width;
 	priv->height = height;
+	priv->savedX = x;
+	priv->savedY = y;
 
 	self->priv = priv;
 }
@@ -131,6 +135,30 @@ p3t_boxMakeRelative (p3t_box  *self,
 {
 	self->priv->x -= p3t_boxGetX (container);
 	self->priv->y -= p3t_boxGetY (container);
+}
+
+void
+p3t_boxMove (p3t_box  *self,
+             int       x,
+             int       y)
+{
+	self->priv->x = x;
+	self->priv->y = y;
+}
+
+void
+p3t_boxSavePosition (p3t_box *self)
+{
+	self->priv->savedX = p3t_boxGetX (self);
+	self->priv->savedY = p3t_boxGetY (self);
+}
+
+void
+p3t_boxRestorePosition (p3t_box *self)
+{
+	p3t_boxMove (self,
+                 self->priv->savedX,
+	             self->priv->savedY);
 }
 
 int
