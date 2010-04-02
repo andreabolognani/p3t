@@ -16,11 +16,17 @@
 #define TIMERS_NUMBER      8
 #define SECONDS_PER_MINUTE 60
 
+typedef enum {
+	APPLICATION_STATE_ALL,
+	APPLICATION_STATE_ONE
+} applicationState;
+
 struct _p3t_application {
-	u16               *backgroundBuffer;
-	u16               *widgetsBuffer;
-	p3t_timer        **timers;
-	p3t_timerWidget  **widgets;
+	u16                *backgroundBuffer;
+	u16                *widgetsBuffer;
+	p3t_timer         **timers;
+	p3t_timerWidget   **widgets;
+	applicationState    state;
 };
 
 static void
@@ -28,11 +34,49 @@ activateCallback (p3t_widget  *widget,
                   void        *data)
 {
 	p3t_timerWidget *self;
+	p3t_timerWidget *temp;
+	p3t_application *application;
 	p3t_timer *timer;
+	int i;
 
 	self = P3T_TIMERWIDGET (widget);
+	application = P3T_APPLICATION (data);
 	timer = p3t_timerWidgetGetTimer (self);
 
+	switch (application->state) {
+
+		case APPLICATION_STATE_ALL:
+
+			for (i = 0; i < TIMERS_NUMBER; i++) {
+
+				if (i != (p3t_timerGetNumber (timer) - 1)) {
+
+					temp = application->widgets[i];
+					p3t_boxSavePosition (P3T_BOX (temp));
+					p3t_boxMove (P3T_BOX (temp), 0, 191);
+				}
+
+			}
+
+			p3t_timerStart (timer);
+			application->state = APPLICATION_STATE_ONE;
+			printf ("Moved\n");
+			break;
+
+		case APPLICATION_STATE_ONE:
+
+			for (i = 0; i < TIMERS_NUMBER; i++) {
+
+				temp = application->widgets[i];
+				p3t_boxRestorePosition (P3T_BOX (temp));
+			}
+
+			application->state = APPLICATION_STATE_ALL;
+			printf ("Restored\n");
+			break;
+	}
+
+#if 0
 	if (timer != NULL) {
 		switch (p3t_timerGetState (timer)) {
 
@@ -53,6 +97,7 @@ activateCallback (p3t_widget  *widget,
 				break;
 		}
 	}
+#endif
 }
 
 static void
@@ -70,6 +115,13 @@ paintCallback (p3t_widget  *widget,
 	application = P3T_APPLICATION (data);
 	timer = p3t_timerWidgetGetTimer (self);
 	remaining = p3t_timerGetRemainingTime (timer);
+
+	/* Outline */
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_OUTLINE,
+	                        P3T_PIXMAP_OUTLINE_TIMERWIDGET);
+	p3t_pixmapDraw (pixmap,
+	                P3T_BOX (self),
+	                p3t_applicationGetWidgetsBuffer (application));
 
 	/* Timer number */
 	box = p3t_boxNew (5, 5, 18, 22);
@@ -127,8 +179,6 @@ paintCallback (p3t_widget  *widget,
 static void
 init (p3t_application *self)
 {
-	p3t_pixmap *background;
-	p3t_box *screen;
 	int i;
 
 	self->timers = malloc (TIMERS_NUMBER * sizeof (p3t_timer *));
@@ -158,14 +208,6 @@ init (p3t_application *self)
 	self->backgroundBuffer = (u16*) BG_BMP_RAM (0);
 	self->widgetsBuffer = (u16*) BG_BMP_RAM (8);
 
-	/* Draw background */
-	screen = p3t_boxNew (0, 0, 256, 192);
-	background = p3t_pixmapGet (P3T_PIXMAP_TYPE_BACKGROUND,
-	                            P3T_PIXMAP_BACKGROUND_EIGHT);
-	p3t_pixmapDraw (background,
-	                screen,
-	                self->backgroundBuffer);
-
 #ifdef DEVELOPMENT_BUILD
 	consoleDemoInit ();
 #endif
@@ -194,8 +236,10 @@ init (p3t_application *self)
 		                            self);
 		p3t_widgetSetActivateCallback (P3T_WIDGET (self->widgets[i]),
 		                               &activateCallback,
-		                               NULL);
+		                               self);
 	}
+
+	self->state = APPLICATION_STATE_ALL;
 }
 
 static void
@@ -237,6 +281,8 @@ p3t_applicationUpdate (p3t_application *self,
 {
 	p3t_timer *timer;
 	p3t_point *stylus;
+	p3t_pixmap *background;
+	p3t_box *screen;
 	touchPosition touch;
 	int elapsed;
 	int target;
@@ -267,6 +313,13 @@ p3t_applicationUpdate (p3t_application *self,
 
 		p3t_pointDestroy (stylus);
 	}
+
+	screen = p3t_boxNew (0, 0, 256, 192);
+	background = p3t_pixmapGet (P3T_PIXMAP_TYPE_BACKGROUND,
+	                            P3T_PIXMAP_BACKGROUND_DEFAULT);
+	p3t_pixmapDraw (background,
+	                screen,
+	                self->widgetsBuffer);
 
 	for (i = 0; i < TIMERS_NUMBER; i++) {
 		p3t_widgetPaint (P3T_WIDGET (self->widgets[i]));

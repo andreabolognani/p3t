@@ -45,7 +45,7 @@ enum {
 };
 
 enum {
-	P3T_PIXMAP_BACKGROUND_EIGHT
+	P3T_PIXMAP_BACKGROUND_DEFAULT
 };
 
 struct _p3t_pixmap {
