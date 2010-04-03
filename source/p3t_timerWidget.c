@@ -30,6 +30,7 @@ _p3t_timerWidgetFinalize (p3t_timerWidget *self)
 	if (self->priv->timer != NULL) {
 		p3t_timerDestroy (self->priv->timer);
 	}
+	free (self->priv);
 
 	_p3t_widgetFinalize (P3T_WIDGET (self));
 }
