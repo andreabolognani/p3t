@@ -17,7 +17,7 @@ typedef enum {
 	P3T_PIXMAP_TYPE_BACKGROUND
 } p3t_pixmapType;
 
-enum {
+typedef enum {
 	P3T_PIXMAP_DIGIT_0,
 	P3T_PIXMAP_DIGIT_1,
 	P3T_PIXMAP_DIGIT_2,
@@ -28,9 +28,9 @@ enum {
 	P3T_PIXMAP_DIGIT_7,
 	P3T_PIXMAP_DIGIT_8,
 	P3T_PIXMAP_DIGIT_9
-};
+} p3t_pixmapDigitType;
 
-enum {
+typedef enum {
 	P3T_PIXMAP_NUMBER_1,
 	P3T_PIXMAP_NUMBER_2,
 	P3T_PIXMAP_NUMBER_3,
@@ -39,22 +39,22 @@ enum {
 	P3T_PIXMAP_NUMBER_6,
 	P3T_PIXMAP_NUMBER_7,
 	P3T_PIXMAP_NUMBER_8
-};
+} p3t_pixmapNumberType;
 
-enum {
+typedef enum {
 	P3T_PIXMAP_BUTTON_UP,
 	P3T_PIXMAP_BUTTON_DOWN,
 	P3T_PIXMAP_BUTTON_ACTION
-};
+} p3t_pixmapButtonType;
 
-enum {
+typedef enum {
 	P3T_PIXMAP_OUTLINE_TIMERWIDGET,
 	P3T_PIXMAP_OUTLINE_BUTTON
-};
+} p3t_pixmapOutlineType;
 
-enum {
+typedef enum {
 	P3T_PIXMAP_BACKGROUND_DEFAULT
-};
+} p3t_pixmapBackgroundType;
 
 struct _p3t_pixmap {
 	p3t_box             baseObject;
