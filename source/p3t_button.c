@@ -54,3 +54,9 @@ p3t_buttonDestroy (p3t_button *self)
 	_p3t_buttonFinalize (self);
 	free (self);
 }
+
+p3t_pixmapButtonType
+p3t_buttonGetType (p3t_button *self)
+{
+	return self->priv->buttonType;
+}

@@ -14,20 +14,22 @@ struct _p3t_button {
 	p3t_buttonPrivate  *priv;
 };
 
-p3t_button*  p3t_buttonNew       (int                    x,
-                                  int                    y,
-                                  int                    width,
-                                  int                    height,
-                                  p3t_pixmapButtonType   buttonType);
-void         p3t_buttonDestroy   (p3t_button            *button);
+p3t_button*            p3t_buttonNew       (int                    x,
+                                            int                    y,
+                                            int                    width,
+                                            int                    height,
+                                            p3t_pixmapButtonType   buttonType);
+void                   p3t_buttonDestroy   (p3t_button            *button);
+
+p3t_pixmapButtonType   p3t_buttonGetType   (p3t_button            *button);
 
 /* To be used only for inheritance*/
-void        _p3t_buttonInit      (p3t_button            *button,
-                                  int                    x,
-                                  int                    y,
-                                  int                    width,
-                                  int                    height,
-                                  p3t_pixmapButtonType   buttonType);
-void        _p3t_buttonFinalize  (p3t_button            *button);
+void                  _p3t_buttonInit      (p3t_button            *button,
+                                            int                    x,
+                                            int                    y,
+                                            int                    width,
+                                            int                    height,
+                                            p3t_pixmapButtonType   buttonType);
+void                  _p3t_buttonFinalize  (p3t_button            *button);
 
 #endif /* __P3T_BUTTON_H__ */
