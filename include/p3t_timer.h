@@ -3,6 +3,8 @@
 
 #include <p3t_clock.h>
 
+#define P3T_TIMER(x) ((p3t_timer*) (x))
+
 typedef struct _p3t_timer p3t_timer;
 
 typedef enum {

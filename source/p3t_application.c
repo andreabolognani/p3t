@@ -27,8 +27,85 @@ struct _p3t_application {
 	p3t_timer         **timers;
 	p3t_timerWidget   **widgets;
 	p3t_timerWidget    *active;
+	p3t_button         *actionButton;
+	p3t_button         *upButton;
+	p3t_button         *downButton;
 	applicationState    state;
 };
+
+static void
+actionButtonActivateCallback (p3t_widget  *widget,
+                              void        *data)
+{
+	p3t_timer *timer;
+
+	timer = P3T_TIMER (data);
+
+	switch (p3t_timerGetState (timer)) {
+
+		case P3T_TIMER_STATE_STOPPED:
+		case P3T_TIMER_STATE_PAUSED:
+
+			p3t_timerStart (timer);
+			break;
+
+		case P3T_TIMER_STATE_RUNNING:
+
+			p3t_timerPause (timer);
+			break;
+
+		case P3T_TIMER_STATE_FINISHED:
+
+			p3t_timerStop (timer);
+			break;
+	}
+}
+
+static void
+upButtonActivateCallback (p3t_widget  *widget,
+                          void        *data)
+{
+	p3t_timer *timer;
+
+	timer = P3T_TIMER (data);
+
+	p3t_timerIncreaseTargetTime (timer);
+}
+
+static void
+downButtonActivateCallback (p3t_widget  *widget,
+                            void        *data)
+{
+	p3t_timer *timer;
+
+	timer = P3T_TIMER (data);
+
+	p3t_timerDecreaseTargetTime (timer);
+}
+
+static void
+buttonPaintCallback (p3t_widget  *widget,
+                     void        *data)
+{
+	p3t_button *self;
+	p3t_pixmap *pixmap;
+	p3t_box *box;
+	u16 *videoBuffer;
+
+	self = P3T_BUTTON (widget);
+	videoBuffer = (u16*) data;
+
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_OUTLINE,
+	                        P3T_PIXMAP_OUTLINE_BUTTON);
+	p3t_pixmapDraw (pixmap, P3T_BOX (self), videoBuffer);
+
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_BUTTON,
+	                        p3t_buttonGetType (self));
+	box = p3t_boxNew (1, 1, 42, 42);
+	p3t_boxMakeAbsolute (box, P3T_BOX (self));
+	p3t_pixmapDraw (pixmap, box, videoBuffer);
+	p3t_boxDestroy (box);
+}
 
 static void
 timerWidgetActivateCallback (p3t_widget  *widget,
@@ -37,7 +114,9 @@ timerWidgetActivateCallback (p3t_widget  *widget,
 	p3t_timerWidget *self;
 	p3t_timerWidget *temp;
 	p3t_application *application;
+	p3t_button *button;
 	p3t_timer *timer;
+	int x;
 	int i;
 
 	self = P3T_TIMERWIDGET (widget);
@@ -59,6 +138,44 @@ timerWidgetActivateCallback (p3t_widget  *widget,
 
 			}
 
+			if (p3t_boxGetX (P3T_BOX (self)) <= (SCREEN_WIDTH / 2)) {
+				x = 168;
+				/* The active timerWidget is on the left side */
+			}
+			else {
+				x = 44;  /* The active timerWidget is on the right side */
+			}
+
+			/* Action button */
+			button = p3t_buttonNew (x, 27, 44, 44, P3T_PIXMAP_BUTTON_ACTION);
+			p3t_widgetSetActivateCallback (P3T_WIDGET (button),
+			                               &actionButtonActivateCallback,
+			                               p3t_timerWidgetGetTimer (self));
+			p3t_widgetSetPaintCallback (P3T_WIDGET (button),
+										&buttonPaintCallback,
+										application->videoBuffer);
+			application->actionButton = button;
+
+			/* Up button */
+			button = p3t_buttonNew (x, 74, 44, 44, P3T_PIXMAP_BUTTON_UP);
+			p3t_widgetSetActivateCallback (P3T_WIDGET (button),
+			                               &upButtonActivateCallback,
+			                               p3t_timerWidgetGetTimer (self));
+			p3t_widgetSetPaintCallback (P3T_WIDGET (button),
+										&buttonPaintCallback,
+										application->videoBuffer);
+			application->upButton = button;
+
+			/* Down button */
+			button = p3t_buttonNew (x, 121, 44, 44, P3T_PIXMAP_BUTTON_DOWN);
+			p3t_widgetSetActivateCallback (P3T_WIDGET (button),
+			                               &downButtonActivateCallback,
+			                               p3t_timerWidgetGetTimer (self));
+			p3t_widgetSetPaintCallback (P3T_WIDGET (button),
+										&buttonPaintCallback,
+										application->videoBuffer);
+			application->downButton = button;
+
 			application->state = APPLICATION_STATE_ONE;
 			application->active = self;
 			break;
@@ -71,33 +188,23 @@ timerWidgetActivateCallback (p3t_widget  *widget,
 				p3t_boxRestorePosition (P3T_BOX (temp));
 			}
 
+			if (application->actionButton != NULL) {
+				p3t_buttonDestroy (application->actionButton);
+				application->actionButton = NULL;
+			}
+			if (application->upButton != NULL) {
+				p3t_buttonDestroy (application->upButton);
+				application->upButton = NULL;
+			}
+			if (application->downButton != NULL) {
+				p3t_buttonDestroy (application->downButton);
+				application->downButton = NULL;
+			}
+
 			application->state = APPLICATION_STATE_ALL;
 			application->active = NULL;
 			break;
 	}
-
-#if 0
-	if (timer != NULL) {
-		switch (p3t_timerGetState (timer)) {
-
-			case P3T_TIMER_STATE_STOPPED:
-			case P3T_TIMER_STATE_PAUSED:
-
-				p3t_timerStart (timer);
-				break;
-
-			case P3T_TIMER_STATE_RUNNING:
-
-				p3t_timerPause (timer);
-				break;
-
-			case P3T_TIMER_STATE_FINISHED:
-
-				p3t_timerStop (timer);
-				break;
-		}
-	}
-#endif
 }
 
 static void
@@ -165,30 +272,6 @@ timerWidgetPaintCallback (p3t_widget  *widget,
 }
 
 static void
-buttonPaintCallback (p3t_widget  *widget,
-                     void        *data)
-{
-	p3t_button *self;
-	p3t_pixmap *pixmap;
-	p3t_box *box;
-	u16 *videoBuffer;
-
-	self = P3T_BUTTON (widget);
-	videoBuffer = (u16*) data;
-
-	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_OUTLINE,
-	                        P3T_PIXMAP_OUTLINE_BUTTON);
-	p3t_pixmapDraw (pixmap, P3T_BOX (self), videoBuffer);
-
-	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_BUTTON,
-	                        p3t_buttonGetType (self));
-	box = p3t_boxNew (1, 1, 42, 42);
-	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-	p3t_pixmapDraw (pixmap, box, videoBuffer);
-	p3t_boxDestroy (box);
-}
-
-static void
 init (p3t_application *self)
 {
 	int i;
@@ -243,8 +326,12 @@ init (p3t_application *self)
 		                               self);
 	}
 
-	self->state = APPLICATION_STATE_ALL;
 	self->active = NULL;
+	self->actionButton = NULL;
+	self->upButton = NULL;
+	self->downButton = NULL;
+
+	self->state = APPLICATION_STATE_ALL;
 }
 
 static void
@@ -283,10 +370,8 @@ p3t_applicationDestroy (p3t_application *self)
 static void
 paint (p3t_application *self)
 {
-	p3t_button *button;
 	p3t_pixmap *background;
 	p3t_box *box;
-	int x;
 	int i;
 
 	/* Paint background image */
@@ -300,36 +385,9 @@ paint (p3t_application *self)
 		/* Paint the active timerWidget */
 		p3t_widgetPaint (P3T_WIDGET (self->active));
 
-		if (p3t_boxGetX (P3T_BOX (self->active)) <= (SCREEN_WIDTH / 2)) {
-			x = 168; /* The active timerWidget is on the left side */
-		}
-		else {
-			x = 44;  /* The active timerWidget is on the right side */
-		}
-
-		/* Action button */
-		button = p3t_buttonNew (x, 27, 44, 44, P3T_PIXMAP_BUTTON_ACTION);
-		p3t_widgetSetPaintCallback (P3T_WIDGET (button),
-		                            &buttonPaintCallback,
-		                            self->videoBuffer);
-		p3t_widgetPaint (P3T_WIDGET (button));
-		p3t_buttonDestroy (button);
-
-		/* Up button */
-		button = p3t_buttonNew (x, 74, 44, 44, P3T_PIXMAP_BUTTON_UP);
-		p3t_widgetSetPaintCallback (P3T_WIDGET (button),
-		                            &buttonPaintCallback,
-		                            self->videoBuffer);
-		p3t_widgetPaint (P3T_WIDGET (button));
-		p3t_buttonDestroy (button);
-
-		/* Down button */
-		button = p3t_buttonNew (x, 121, 44, 44, P3T_PIXMAP_BUTTON_DOWN);
-		p3t_widgetSetPaintCallback (P3T_WIDGET (button),
-		                            &buttonPaintCallback,
-		                            self->videoBuffer);
-		p3t_widgetPaint (P3T_WIDGET (button));
-		p3t_buttonDestroy (button);
+		p3t_widgetPaint (P3T_WIDGET (self->actionButton));
+		p3t_widgetPaint (P3T_WIDGET (self->upButton));
+		p3t_widgetPaint (P3T_WIDGET (self->downButton));
 	}
 	else {
 
@@ -372,6 +430,16 @@ p3t_applicationUpdate (p3t_application *self,
 
 		for (i = 0; i < TIMERS_NUMBER; i++) {
 			p3t_widgetTryActivate (P3T_WIDGET (self->widgets[i]),
+			                       stylus);
+		}
+
+		/* Try to activate the action buttons */
+		if (self->state == APPLICATION_STATE_ONE) {
+			p3t_widgetTryActivate (P3T_WIDGET (self->actionButton),
+			                       stylus);
+			p3t_widgetTryActivate (P3T_WIDGET (self->upButton),
+			                       stylus);
+			p3t_widgetTryActivate (P3T_WIDGET (self->downButton),
 			                       stylus);
 		}
 
