@@ -23,15 +23,21 @@
 #include <number7.h>
 #include <number8.h>
 
+#include <buttonUp.h>
+#include <buttonDown.h>
+#include <buttonAction.h>
+
 #include <outlineTimerWidget.h>
+#include <outlineButton.h>
 
 #include <background.h>
 
-#define TYPES_NUMBER 4
+#define TYPES_NUMBER 5
 
 #define DIGITS_NUMBER      10
 #define NUMBERS_NUMBER     8
-#define OUTLINES_NUMBER    1
+#define BUTTONS_NUMBER     3
+#define OUTLINES_NUMBER    2
 #define BACKGROUNDS_NUMBER 1
 
 #define DIGIT_WIDTH  18
@@ -39,6 +45,9 @@
 
 #define NUMBER_WIDTH  18
 #define NUMBER_HEIGHT 22
+
+#define BUTTON_WIDTH  42
+#define BUTTON_HEIGHT 42
 
 #define BACKGROUND_WIDTH  256
 #define BACKGROUND_HEIGHT 192
@@ -58,6 +67,10 @@ static void  digitInfo       (int    identifier,
                               int   *width,
                               int   *height);
 static void  numberInfo      (int    identifier,
+                              u16  **data,
+                              int   *width,
+                              int   *height);
+static void  buttonInfo      (int    identifier,
                               u16  **data,
                               int   *width,
                               int   *height);
@@ -89,6 +102,13 @@ prepare (void)
 
 	for (i = 0; i < NUMBERS_NUMBER; i++) {
 		pixmaps[P3T_PIXMAP_TYPE_NUMBER][i] = NULL;
+	}
+
+	/* Buttons */
+	pixmaps[P3T_PIXMAP_TYPE_BUTTON] = (p3t_pixmap**) malloc (BUTTONS_NUMBER * sizeof (p3t_pixmap*));
+
+	for (i = 0; i < BUTTONS_NUMBER; i++) {
+		pixmaps[P3T_PIXMAP_TYPE_BUTTON][i] = NULL;
 	}
 
 	/* Outlines */
@@ -127,6 +147,11 @@ _p3t_pixmapInit (p3t_pixmap      *self,
 		case P3T_PIXMAP_TYPE_NUMBER:
 
 			numberInfo (identifier, &data, &width, &height);
+			break;
+
+		case P3T_PIXMAP_TYPE_BUTTON:
+
+			buttonInfo (identifier, &data, &width, &height);
 			break;
 
 		case P3T_PIXMAP_TYPE_OUTLINE:
@@ -300,6 +325,31 @@ numberInfo (int     identifier,
 }
 
 static void
+buttonInfo (int    identifier,
+            u16  **data,
+            int   *width,
+            int   *height)
+{
+	*width = BUTTON_WIDTH;
+	*height = BUTTON_HEIGHT;
+
+	switch (identifier) {
+
+		case P3T_PIXMAP_BUTTON_UP:
+			*data = (u16*) buttonUpBitmap;
+			break;
+
+		case P3T_PIXMAP_BUTTON_DOWN:
+			*data = (u16*) buttonDownBitmap;
+			break;
+
+		case P3T_PIXMAP_BUTTON_ACTION:
+			*data = (u16*) buttonActionBitmap;
+			break;
+	}
+}
+
+static void
 outlineInfo (int    identifier,
              u16  **data,
              int   *width,
@@ -312,6 +362,13 @@ outlineInfo (int    identifier,
 			*width = 124;
 			*height = 45;
 			*data = (u16*) outlineTimerWidgetBitmap;
+			break;
+
+		case P3T_PIXMAP_OUTLINE_BUTTON:
+
+			*width = 44;
+			*height = 44;
+			*data = (u16*) outlineButtonBitmap;
 			break;
 	}
 }
