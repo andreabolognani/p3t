@@ -53,14 +53,12 @@ activateCallback (p3t_widget  *widget,
 
 					temp = application->widgets[i];
 					p3t_boxSavePosition (P3T_BOX (temp));
-					p3t_boxMove (P3T_BOX (temp), 0, 191);
+					p3t_boxMove (P3T_BOX (temp), 0, SCREEN_HEIGHT);
 				}
 
 			}
 
-			p3t_timerStart (timer);
 			application->state = APPLICATION_STATE_ONE;
-			printf ("Moved\n");
 			break;
 
 		case APPLICATION_STATE_ONE:
@@ -72,7 +70,6 @@ activateCallback (p3t_widget  *widget,
 			}
 
 			application->state = APPLICATION_STATE_ALL;
-			printf ("Restored\n");
 			break;
 	}
 
