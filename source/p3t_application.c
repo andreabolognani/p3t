@@ -22,8 +22,7 @@ typedef enum {
 } applicationState;
 
 struct _p3t_application {
-	u16                *backgroundBuffer;
-	u16                *widgetsBuffer;
+	u16                *videoBuffer;
 	p3t_timer         **timers;
 	p3t_timerWidget   **widgets;
 	applicationState    state;
@@ -102,32 +101,28 @@ paintCallback (p3t_widget  *widget,
                void        *data)
 {
 	p3t_timerWidget *self;
-	p3t_application *application;
 	p3t_timer *timer;
 	p3t_pixmap *pixmap;
 	p3t_box *box;
+	u16 *videoBuffer;
 	char *remaining;
 
 	self = P3T_TIMERWIDGET (widget);
-	application = P3T_APPLICATION (data);
+	videoBuffer = (u16*) data;
 	timer = p3t_timerWidgetGetTimer (self);
 	remaining = p3t_timerGetRemainingTime (timer);
 
 	/* Outline */
 	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_OUTLINE,
 	                        P3T_PIXMAP_OUTLINE_TIMERWIDGET);
-	p3t_pixmapDraw (pixmap,
-	                P3T_BOX (self),
-	                p3t_applicationGetWidgetsBuffer (application));
+	p3t_pixmapDraw (pixmap, P3T_BOX (self), videoBuffer);
 
 	/* Timer number */
 	box = p3t_boxNew (5, 5, 18, 22);
 	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_NUMBER,
 	                        p3t_timerGetNumber (timer) - 1);
 	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-	p3t_pixmapDraw (pixmap,
-	                box,
-	                p3t_applicationGetWidgetsBuffer (application));
+	p3t_pixmapDraw (pixmap, box, videoBuffer);
 	p3t_boxDestroy (box);
 
 	/* Last digit */
@@ -135,9 +130,7 @@ paintCallback (p3t_widget  *widget,
 	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
 	                        remaining[4] - 48);
 	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-	p3t_pixmapDraw (pixmap,
-	                box,
-	                p3t_applicationGetWidgetsBuffer (application));
+	p3t_pixmapDraw (pixmap, box, videoBuffer);
 	p3t_boxDestroy (box);
 
 	/* Third digit */
@@ -145,9 +138,7 @@ paintCallback (p3t_widget  *widget,
 	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
 	                        remaining[3] - 48);
 	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-	p3t_pixmapDraw (pixmap,
-	                box,
-	                p3t_applicationGetWidgetsBuffer (application));
+	p3t_pixmapDraw (pixmap, box, videoBuffer);
 	p3t_boxDestroy (box);
 
 	/* Second digit */
@@ -155,9 +146,7 @@ paintCallback (p3t_widget  *widget,
 	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
 	                        remaining[1] - 48);
 	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-	p3t_pixmapDraw (pixmap,
-	                box,
-	                p3t_applicationGetWidgetsBuffer (application));
+	p3t_pixmapDraw (pixmap, box, videoBuffer);
 	p3t_boxDestroy (box);
 
 	/* First digit */
@@ -165,9 +154,7 @@ paintCallback (p3t_widget  *widget,
 	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
 	                        remaining[0] - 48);
 	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-	p3t_pixmapDraw (pixmap,
-	                box,
-	                p3t_applicationGetWidgetsBuffer (application));
+	p3t_pixmapDraw (pixmap, box, videoBuffer);
 	p3t_boxDestroy (box);
 
 	free (remaining);
@@ -184,26 +171,18 @@ init (p3t_application *self)
 	powerOn (POWER_ALL_2D);
 
 	vramSetBankA (VRAM_A_MAIN_BG_0x06000000);
-	vramSetBankB (VRAM_B_MAIN_BG_0x06020000);
 
 	videoSetMode (MODE_5_2D |
-	              DISPLAY_BG2_ACTIVE |
 	              DISPLAY_BG3_ACTIVE);
 
 	BACKGROUND.control[3] = BG_BMP16_256x256 | BG_BMP_BASE (0);
-	BACKGROUND.control[2] = BG_BMP16_256x256 | BG_BMP_BASE (8);
 
 	BACKGROUND.bg3_rotation.xdy = 0;
 	BACKGROUND.bg3_rotation.xdx = 1 << 8;
 	BACKGROUND.bg3_rotation.ydy = 1 << 8;
 	BACKGROUND.bg3_rotation.ydx = 0;
-	BACKGROUND.bg2_rotation.xdy = 0;
-	BACKGROUND.bg2_rotation.xdx = 1 << 8;
-	BACKGROUND.bg2_rotation.ydy = 1 << 8;
-	BACKGROUND.bg2_rotation.ydx = 0;
 
-	self->backgroundBuffer = (u16*) BG_BMP_RAM (0);
-	self->widgetsBuffer = (u16*) BG_BMP_RAM (8);
+	self->videoBuffer = (u16*) BG_BMP_RAM (0);
 
 #ifdef DEVELOPMENT_BUILD
 	consoleDemoInit ();
@@ -230,7 +209,7 @@ init (p3t_application *self)
 
 		p3t_widgetSetPaintCallback (P3T_WIDGET (self->widgets[i]),
 		                            &paintCallback,
-		                            self);
+		                            self->videoBuffer);
 		p3t_widgetSetActivateCallback (P3T_WIDGET (self->widgets[i]),
 		                               &activateCallback,
 		                               self);
@@ -314,23 +293,9 @@ p3t_applicationUpdate (p3t_application *self,
 	screen = p3t_boxNew (0, 0, 256, 192);
 	background = p3t_pixmapGet (P3T_PIXMAP_TYPE_BACKGROUND,
 	                            P3T_PIXMAP_BACKGROUND_DEFAULT);
-	p3t_pixmapDraw (background,
-	                screen,
-	                self->widgetsBuffer);
+	p3t_pixmapDraw (background, screen, self->videoBuffer);
 
 	for (i = 0; i < TIMERS_NUMBER; i++) {
 		p3t_widgetPaint (P3T_WIDGET (self->widgets[i]));
 	}
-}
-
-u16*
-p3t_applicationGetBackgroundBuffer (p3t_application *self)
-{
-	return self->backgroundBuffer;
-}
-
-u16*
-p3t_applicationGetWidgetsBuffer (p3t_application *self)
-{
-	return self->widgetsBuffer;
 }
