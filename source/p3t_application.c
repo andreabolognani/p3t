@@ -147,7 +147,7 @@ timerWidgetActivateCallback (p3t_widget  *widget,
 			}
 
 			/* Action button */
-			button = p3t_buttonNew (x, 27, 44, 44, P3T_PIXMAP_BUTTON_ACTION);
+			button = p3t_buttonNew (x, 17, 44, 44, P3T_PIXMAP_BUTTON_ACTION);
 			p3t_widgetSetActivateCallback (P3T_WIDGET (button),
 			                               &actionButtonActivateCallback,
 			                               p3t_timerWidgetGetTimer (self));
@@ -167,7 +167,7 @@ timerWidgetActivateCallback (p3t_widget  *widget,
 			application->upButton = button;
 
 			/* Down button */
-			button = p3t_buttonNew (x, 121, 44, 44, P3T_PIXMAP_BUTTON_DOWN);
+			button = p3t_buttonNew (x, 131, 44, 44, P3T_PIXMAP_BUTTON_DOWN);
 			p3t_widgetSetActivateCallback (P3T_WIDGET (button),
 			                               &downButtonActivateCallback,
 			                               p3t_timerWidgetGetTimer (self));
