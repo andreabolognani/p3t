@@ -31,6 +31,7 @@ struct _p3t_application {
 	p3t_button         *upButton;
 	p3t_button         *downButton;
 	applicationState    state;
+	applicationState    lastState;
 };
 
 static void
@@ -332,6 +333,7 @@ init (p3t_application *self)
 	self->downButton = NULL;
 
 	self->state = APPLICATION_STATE_ALL;
+	self->lastState = APPLICATION_STATE_ONE;
 }
 
 static void
@@ -374,11 +376,18 @@ paint (p3t_application *self)
 	p3t_box *box;
 	int i;
 
-	/* Paint background image */
-	box = p3t_boxNew (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-	background = p3t_pixmapGet (P3T_PIXMAP_TYPE_BACKGROUND,
-	                            P3T_PIXMAP_BACKGROUND_DEFAULT);
-	p3t_pixmapDraw (background, box, self->videoBuffer);
+	/* There's no need to paint the background every single
+	 * vblank, just draw it when the mode changes */
+	if (self->state != self->lastState) {
+
+		/* Paint background image */
+		box = p3t_boxNew (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		background = p3t_pixmapGet (P3T_PIXMAP_TYPE_BACKGROUND,
+									P3T_PIXMAP_BACKGROUND_DEFAULT);
+		p3t_pixmapDraw (background, box, self->videoBuffer);
+
+		self->lastState = self->state;
+	}
 
 	if (self->state == APPLICATION_STATE_ONE) {
 
