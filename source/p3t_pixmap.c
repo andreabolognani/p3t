@@ -43,11 +43,11 @@
 #define DIGIT_WIDTH  18
 #define DIGIT_HEIGHT 34
 
-#define NUMBER_WIDTH  18
-#define NUMBER_HEIGHT 22
+#define NUMBER_WIDTH  22
+#define NUMBER_HEIGHT 26
 
-#define BUTTON_WIDTH  42
-#define BUTTON_HEIGHT 42
+#define BUTTON_WIDTH  40
+#define BUTTON_HEIGHT 40
 
 #define BACKGROUND_WIDTH  256
 #define BACKGROUND_HEIGHT 192
@@ -359,8 +359,8 @@ outlineInfo (int    identifier,
 
 		case P3T_PIXMAP_OUTLINE_TIMERWIDGET:
 
-			*width = 124;
-			*height = 45;
+			*width = 122;
+			*height = 44;
 			*data = (u16*) outlineTimerWidgetBitmap;
 			break;
 
