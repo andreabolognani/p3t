@@ -16,9 +16,6 @@ struct _p3t_application {
 p3t_application*  p3t_applicationNew       (void);
 void              p3t_applicationDestroy   (p3t_application  *application);
 
-void              p3t_applicationUpdate    (p3t_application  *application,
-                                            int               input);
-
 /* To be used only for inheritance */
 void             _p3t_applicationInit      (p3t_application  *application);
 void             _p3t_applicationFinalize  (p3t_application  *application);

@@ -33,6 +33,94 @@ struct _p3t_applicationPrivate {
 };
 
 static void
+paintCallback (p3t_widget  *widget,
+               void        *data)
+{
+	p3t_application *self;
+	p3t_applicationPrivate *priv;
+	p3t_pixmap *background;
+	p3t_box *box;
+	int i;
+
+	self = P3T_APPLICATION (widget);
+	priv = self->priv;
+
+	/* There's no need to paint the background every single
+	 * vblank, just draw it when the mode changes */
+	if (priv->state != priv->lastState) {
+
+		/* Paint background image */
+		box = p3t_boxNew (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		background = p3t_pixmapGet (P3T_PIXMAP_TYPE_BACKGROUND,
+									P3T_PIXMAP_BACKGROUND_DEFAULT);
+		p3t_pixmapDraw (background, box);
+
+		priv->lastState = priv->state;
+	}
+
+	if (priv->state == APPLICATION_STATE_ONE) {
+
+		/* Paint the active timerWidget */
+		p3t_widgetPaint (P3T_WIDGET (priv->active));
+
+		p3t_widgetPaint (P3T_WIDGET (priv->actionButton));
+		p3t_widgetPaint (P3T_WIDGET (priv->upButton));
+		p3t_widgetPaint (P3T_WIDGET (priv->downButton));
+	}
+	else {
+
+		for (i = 0; i < TIMERS_NUMBER; i++) {
+
+			/* Paint all the timerWidgets */
+			p3t_widgetPaint (P3T_WIDGET (priv->widgets[i]));
+		}
+	}
+}
+
+static void
+activateCallback (p3t_widget  *widget,
+                  p3t_point   *stylus,
+                  void        *data)
+{
+	p3t_application *self;
+	p3t_applicationPrivate *priv;
+	p3t_timer *timer;
+	int elapsed;
+	int target;
+	int i;
+
+	self = P3T_APPLICATION (widget);
+	priv = self->priv;
+
+	for (i = 0; i < TIMERS_NUMBER; i++) {
+
+		timer = priv->timers[i];
+
+		elapsed = p3t_timerGetElapsedSeconds (timer);
+		target = p3t_timerGetTargetSeconds (timer);
+
+		if (elapsed >= target) {
+			p3t_timerFinish (timer);
+		}
+	}
+
+	for (i = 0; i < TIMERS_NUMBER; i++) {
+		p3t_widgetTryActivate (P3T_WIDGET (priv->widgets[i]),
+							   stylus);
+	}
+
+	/* Try to activate the action buttons */
+	if (priv->state == APPLICATION_STATE_ONE) {
+		p3t_widgetTryActivate (P3T_WIDGET (priv->actionButton),
+							   stylus);
+		p3t_widgetTryActivate (P3T_WIDGET (priv->upButton),
+							   stylus);
+		p3t_widgetTryActivate (P3T_WIDGET (priv->downButton),
+							   stylus);
+	}
+}
+
+static void
 actionButtonActivateCallback (p3t_widget  *widget,
                               p3t_point   *stylus,
                               void        *data)
@@ -232,6 +320,13 @@ _p3t_applicationInit (p3t_application *self)
 	priv->lastState = APPLICATION_STATE_ONE;
 
 	self->priv = priv;
+
+	p3t_widgetSetPaintCallback (P3T_WIDGET (self),
+	                            &paintCallback,
+	                            NULL);
+	p3t_widgetSetActivateCallback (P3T_WIDGET (self),
+	                               &activateCallback,
+	                               NULL);
 }
 
 void
@@ -284,97 +379,3 @@ p3t_applicationDestroy (p3t_application *self)
 	free (self);
 }
 
-static void
-paint (p3t_application *self)
-{
-	p3t_applicationPrivate *priv;
-	p3t_pixmap *background;
-	p3t_box *box;
-	int i;
-
-	priv = self->priv;
-
-	/* There's no need to paint the background every single
-	 * vblank, just draw it when the mode changes */
-	if (priv->state != priv->lastState) {
-
-		/* Paint background image */
-		box = p3t_boxNew (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-		background = p3t_pixmapGet (P3T_PIXMAP_TYPE_BACKGROUND,
-									P3T_PIXMAP_BACKGROUND_DEFAULT);
-		p3t_pixmapDraw (background, box);
-
-		priv->lastState = priv->state;
-	}
-
-	if (priv->state == APPLICATION_STATE_ONE) {
-
-		/* Paint the active timerWidget */
-		p3t_widgetPaint (P3T_WIDGET (priv->active));
-
-		p3t_widgetPaint (P3T_WIDGET (priv->actionButton));
-		p3t_widgetPaint (P3T_WIDGET (priv->upButton));
-		p3t_widgetPaint (P3T_WIDGET (priv->downButton));
-	}
-	else {
-
-		for (i = 0; i < TIMERS_NUMBER; i++) {
-
-			/* Paint all the timerWidgets */
-			p3t_widgetPaint (P3T_WIDGET (priv->widgets[i]));
-		}
-	}
-}
-
-void
-p3t_applicationUpdate (p3t_application *self,
-                       int              input)
-{
-	p3t_applicationPrivate *priv;
-	p3t_timer *timer;
-	p3t_point *stylus;
-	touchPosition touch;
-	int elapsed;
-	int target;
-	int i;
-
-	priv = self->priv;
-
-	for (i = 0; i < TIMERS_NUMBER; i++) {
-
-		timer = priv->timers[i];
-
-		elapsed = p3t_timerGetElapsedSeconds (timer);
-		target = p3t_timerGetTargetSeconds (timer);
-
-		if (elapsed >= target) {
-			p3t_timerFinish (timer);
-		}
-	}
-
-	if (input & KEY_TOUCH) {
-
-		/* Convert a touchPosition to a p3t_point */
-		touchRead (&touch);
-		stylus = p3t_pointNew (touch.px, touch.py);
-
-		for (i = 0; i < TIMERS_NUMBER; i++) {
-			p3t_widgetTryActivate (P3T_WIDGET (priv->widgets[i]),
-			                       stylus);
-		}
-
-		/* Try to activate the action buttons */
-		if (priv->state == APPLICATION_STATE_ONE) {
-			p3t_widgetTryActivate (P3T_WIDGET (priv->actionButton),
-			                       stylus);
-			p3t_widgetTryActivate (P3T_WIDGET (priv->upButton),
-			                       stylus);
-			p3t_widgetTryActivate (P3T_WIDGET (priv->downButton),
-			                       stylus);
-		}
-
-		p3t_pointDestroy (stylus);
-	}
-
-	paint (self);
-}
