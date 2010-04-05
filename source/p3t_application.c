@@ -234,6 +234,16 @@ finalize (p3t_application *self)
 		p3t_timerWidgetDestroy (self->widgets[i]);
 	}
 
+	if (self->actionButton != NULL) {
+		p3t_buttonDestroy (self->actionButton);
+	}
+	if (self->upButton != NULL) {
+		p3t_buttonDestroy (self->upButton);
+	}
+	if (self->downButton != NULL) {
+		p3t_buttonDestroy (self->downButton);
+	}
+
 	/* Destroy containers */
 	free (self->timers);
 	free (self->widgets);
