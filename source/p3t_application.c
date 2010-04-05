@@ -3,7 +3,6 @@
 #include <p3t_point.h>
 #include <p3t_box.h>
 #include <p3t_pixmap.h>
-#include <p3t_widget.h>
 #include <p3t_timerWidget.h>
 #include <p3t_button.h>
 
@@ -22,7 +21,7 @@ typedef enum {
 	APPLICATION_STATE_ONE
 } applicationState;
 
-struct _p3t_application {
+struct _p3t_applicationPrivate {
 	p3t_timer         **timers;
 	p3t_timerWidget   **widgets;
 	p3t_timerWidget    *active;
@@ -99,7 +98,7 @@ timerWidgetActivateCallback (p3t_widget  *widget,
 	application = P3T_APPLICATION (data);
 	timer = p3t_timerWidgetGetTimer (self);
 
-	switch (application->state) {
+	switch (application->priv->state) {
 
 		case APPLICATION_STATE_ALL:
 
@@ -107,7 +106,7 @@ timerWidgetActivateCallback (p3t_widget  *widget,
 
 				if (i != (p3t_timerGetNumber (timer) - 1)) {
 
-					temp = application->widgets[i];
+					temp = application->priv->widgets[i];
 					p3t_boxSavePosition (P3T_BOX (temp));
 					p3t_boxMove (P3T_BOX (temp), 0, SCREEN_HEIGHT);
 				}
@@ -127,60 +126,58 @@ timerWidgetActivateCallback (p3t_widget  *widget,
 			p3t_widgetSetActivateCallback (P3T_WIDGET (button),
 			                               &actionButtonActivateCallback,
 			                               p3t_timerWidgetGetTimer (self));
-			application->actionButton = button;
+			application->priv->actionButton = button;
 
 			/* Up button */
 			button = p3t_buttonNew (x, 74, 44, 44, P3T_PIXMAP_BUTTON_UP);
 			p3t_widgetSetActivateCallback (P3T_WIDGET (button),
 			                               &upButtonActivateCallback,
 			                               p3t_timerWidgetGetTimer (self));
-			application->upButton = button;
+			application->priv->upButton = button;
 
 			/* Down button */
 			button = p3t_buttonNew (x, 139, 44, 44, P3T_PIXMAP_BUTTON_DOWN);
 			p3t_widgetSetActivateCallback (P3T_WIDGET (button),
 			                               &downButtonActivateCallback,
 			                               p3t_timerWidgetGetTimer (self));
-			application->downButton = button;
+			application->priv->downButton = button;
 
-			application->state = APPLICATION_STATE_ONE;
-			application->active = self;
+			application->priv->state = APPLICATION_STATE_ONE;
+			application->priv->active = self;
 			break;
 
 		case APPLICATION_STATE_ONE:
 
 			for (i = 0; i < TIMERS_NUMBER; i++) {
 
-				temp = application->widgets[i];
+				temp = application->priv->widgets[i];
 				p3t_boxRestorePosition (P3T_BOX (temp));
 			}
 
-			if (application->actionButton != NULL) {
-				p3t_buttonDestroy (application->actionButton);
-				application->actionButton = NULL;
+			if (application->priv->actionButton != NULL) {
+				p3t_buttonDestroy (application->priv->actionButton);
+				application->priv->actionButton = NULL;
 			}
-			if (application->upButton != NULL) {
-				p3t_buttonDestroy (application->upButton);
-				application->upButton = NULL;
+			if (application->priv->upButton != NULL) {
+				p3t_buttonDestroy (application->priv->upButton);
+				application->priv->upButton = NULL;
 			}
-			if (application->downButton != NULL) {
-				p3t_buttonDestroy (application->downButton);
-				application->downButton = NULL;
+			if (application->priv->downButton != NULL) {
+				p3t_buttonDestroy (application->priv->downButton);
+				application->priv->downButton = NULL;
 			}
 
-			application->state = APPLICATION_STATE_ALL;
-			application->active = NULL;
+			application->priv->state = APPLICATION_STATE_ALL;
+			application->priv->active = NULL;
 			break;
 	}
 }
 
-static void
-init (p3t_application *self)
+void
+_p3t_applicationInit (p3t_application *self)
 {
+	p3t_applicationPrivate *priv;
 	int i;
-
-	self->timers = malloc (TIMERS_NUMBER * sizeof (p3t_timer *));
-	self->widgets = malloc (TIMERS_NUMBER * sizeof (p3t_timerWidget *));
 
 	powerOn (POWER_ALL_2D);
 
@@ -195,58 +192,74 @@ init (p3t_application *self)
 
 	mmInitDefaultMem ((mm_addr) soundbank_bin);
 
+	_p3t_widgetInit (P3T_WIDGET (self), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	priv = malloc (sizeof (p3t_applicationPrivate));
+
+	priv->timers = malloc (TIMERS_NUMBER * sizeof (p3t_timer *));
+	priv->widgets = malloc (TIMERS_NUMBER * sizeof (p3t_timerWidget *));
+
 	/* Create all the widgets */
-	self->widgets[0] = p3t_timerWidgetNew (5, 5, 122, 44);
-	self->widgets[1] = p3t_timerWidgetNew (5, 51, 122, 44);
-	self->widgets[2] = p3t_timerWidgetNew (5, 97, 122, 44);
-	self->widgets[3] = p3t_timerWidgetNew (5, 143, 122, 44);
-	self->widgets[4] = p3t_timerWidgetNew (129, 5, 122, 44);
-	self->widgets[5] = p3t_timerWidgetNew (129, 51, 122, 44);
-	self->widgets[6] = p3t_timerWidgetNew (129, 97, 122, 44);
-	self->widgets[7] = p3t_timerWidgetNew (129, 143, 122, 44);
+	priv->widgets[0] = p3t_timerWidgetNew (5, 5, 122, 44);
+	priv->widgets[1] = p3t_timerWidgetNew (5, 51, 122, 44);
+	priv->widgets[2] = p3t_timerWidgetNew (5, 97, 122, 44);
+	priv->widgets[3] = p3t_timerWidgetNew (5, 143, 122, 44);
+	priv->widgets[4] = p3t_timerWidgetNew (129, 5, 122, 44);
+	priv->widgets[5] = p3t_timerWidgetNew (129, 51, 122, 44);
+	priv->widgets[6] = p3t_timerWidgetNew (129, 97, 122, 44);
+	priv->widgets[7] = p3t_timerWidgetNew (129, 143, 122, 44);
 
 	/* Create all the timers and assign each to its widget */
 	for (i = 0; i < TIMERS_NUMBER; i++) {
 
-		self->timers[i] = p3t_timerNew (i + 1);
-		p3t_timerWidgetSetTimer (self->widgets[i], self->timers[i]);
-		p3t_widgetSetActivateCallback (P3T_WIDGET (self->widgets[i]),
+		priv->timers[i] = p3t_timerNew (i + 1);
+		p3t_timerWidgetSetTimer (priv->widgets[i], priv->timers[i]);
+		p3t_widgetSetActivateCallback (P3T_WIDGET (priv->widgets[i]),
 		                               &timerWidgetActivateCallback,
 		                               self);
 	}
 
-	self->active = NULL;
-	self->actionButton = NULL;
-	self->upButton = NULL;
-	self->downButton = NULL;
+	priv->active = NULL;
+	priv->actionButton = NULL;
+	priv->upButton = NULL;
+	priv->downButton = NULL;
 
-	self->state = APPLICATION_STATE_ALL;
-	self->lastState = APPLICATION_STATE_ONE;
+	priv->state = APPLICATION_STATE_ALL;
+	priv->lastState = APPLICATION_STATE_ONE;
+
+	self->priv = priv;
 }
 
-static void
-finalize (p3t_application *self)
+void
+_p3t_applicationFinalize (p3t_application *self)
 {
+	p3t_applicationPrivate *priv;
 	int i;
+
+	priv = self->priv;
 
 	/* Destroy all timers and widgets */
 	for (i = 0; i < TIMERS_NUMBER; i++) {
-		p3t_timerWidgetDestroy (self->widgets[i]);
+		p3t_timerWidgetDestroy (priv->widgets[i]);
 	}
 
-	if (self->actionButton != NULL) {
-		p3t_buttonDestroy (self->actionButton);
+	if (priv->actionButton != NULL) {
+		p3t_buttonDestroy (priv->actionButton);
 	}
-	if (self->upButton != NULL) {
-		p3t_buttonDestroy (self->upButton);
+	if (priv->upButton != NULL) {
+		p3t_buttonDestroy (priv->upButton);
 	}
-	if (self->downButton != NULL) {
-		p3t_buttonDestroy (self->downButton);
+	if (priv->downButton != NULL) {
+		p3t_buttonDestroy (priv->downButton);
 	}
 
 	/* Destroy containers */
-	free (self->timers);
-	free (self->widgets);
+	free (priv->timers);
+	free (priv->widgets);
+
+	free (priv);
+
+	_p3t_widgetFinalize (P3T_WIDGET (self));
 }
 
 p3t_application*
@@ -255,7 +268,7 @@ p3t_applicationNew (void)
 	p3t_application *self;
 
 	self = malloc (sizeof (p3t_application));
-	init (self);
+	_p3t_applicationInit (self);
 
 	return self;
 }
@@ -263,20 +276,23 @@ p3t_applicationNew (void)
 void
 p3t_applicationDestroy (p3t_application *self)
 {
-	finalize (self);
+	_p3t_applicationFinalize (self);
 	free (self);
 }
 
 static void
 paint (p3t_application *self)
 {
+	p3t_applicationPrivate *priv;
 	p3t_pixmap *background;
 	p3t_box *box;
 	int i;
 
+	priv = self->priv;
+
 	/* There's no need to paint the background every single
 	 * vblank, just draw it when the mode changes */
-	if (self->state != self->lastState) {
+	if (priv->state != priv->lastState) {
 
 		/* Paint background image */
 		box = p3t_boxNew (0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -284,24 +300,24 @@ paint (p3t_application *self)
 									P3T_PIXMAP_BACKGROUND_DEFAULT);
 		p3t_pixmapDraw (background, box);
 
-		self->lastState = self->state;
+		priv->lastState = priv->state;
 	}
 
-	if (self->state == APPLICATION_STATE_ONE) {
+	if (priv->state == APPLICATION_STATE_ONE) {
 
 		/* Paint the active timerWidget */
-		p3t_widgetPaint (P3T_WIDGET (self->active));
+		p3t_widgetPaint (P3T_WIDGET (priv->active));
 
-		p3t_widgetPaint (P3T_WIDGET (self->actionButton));
-		p3t_widgetPaint (P3T_WIDGET (self->upButton));
-		p3t_widgetPaint (P3T_WIDGET (self->downButton));
+		p3t_widgetPaint (P3T_WIDGET (priv->actionButton));
+		p3t_widgetPaint (P3T_WIDGET (priv->upButton));
+		p3t_widgetPaint (P3T_WIDGET (priv->downButton));
 	}
 	else {
 
 		for (i = 0; i < TIMERS_NUMBER; i++) {
 
 			/* Paint all the timerWidgets */
-			p3t_widgetPaint (P3T_WIDGET (self->widgets[i]));
+			p3t_widgetPaint (P3T_WIDGET (priv->widgets[i]));
 		}
 	}
 }
@@ -310,6 +326,7 @@ void
 p3t_applicationUpdate (p3t_application *self,
                        int              input)
 {
+	p3t_applicationPrivate *priv;
 	p3t_timer *timer;
 	p3t_point *stylus;
 	touchPosition touch;
@@ -317,9 +334,11 @@ p3t_applicationUpdate (p3t_application *self,
 	int target;
 	int i;
 
+	priv = self->priv;
+
 	for (i = 0; i < TIMERS_NUMBER; i++) {
 
-		timer = self->timers[i];
+		timer = priv->timers[i];
 
 		elapsed = p3t_timerGetElapsedSeconds (timer);
 		target = p3t_timerGetTargetSeconds (timer);
@@ -336,17 +355,17 @@ p3t_applicationUpdate (p3t_application *self,
 		stylus = p3t_pointNew (touch.px, touch.py);
 
 		for (i = 0; i < TIMERS_NUMBER; i++) {
-			p3t_widgetTryActivate (P3T_WIDGET (self->widgets[i]),
+			p3t_widgetTryActivate (P3T_WIDGET (priv->widgets[i]),
 			                       stylus);
 		}
 
 		/* Try to activate the action buttons */
-		if (self->state == APPLICATION_STATE_ONE) {
-			p3t_widgetTryActivate (P3T_WIDGET (self->actionButton),
+		if (priv->state == APPLICATION_STATE_ONE) {
+			p3t_widgetTryActivate (P3T_WIDGET (priv->actionButton),
 			                       stylus);
-			p3t_widgetTryActivate (P3T_WIDGET (self->upButton),
+			p3t_widgetTryActivate (P3T_WIDGET (priv->upButton),
 			                       stylus);
-			p3t_widgetTryActivate (P3T_WIDGET (self->downButton),
+			p3t_widgetTryActivate (P3T_WIDGET (priv->downButton),
 			                       stylus);
 		}
 
