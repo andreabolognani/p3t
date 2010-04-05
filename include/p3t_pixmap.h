@@ -2,7 +2,6 @@
 #define __P3T_PIXMAP_H__
 
 #include <p3t_box.h>
-#include <nds.h>
 
 #define P3T_PIXMAP(x) ((p3t_pixmap*) (x))
 
@@ -64,7 +63,6 @@ struct _p3t_pixmap {
 p3t_pixmap*  p3t_pixmapGet        (p3t_pixmapType   type,
                                    int              identifier);
 void         p3t_pixmapDraw       (p3t_pixmap      *pixmap,
-                                   p3t_box         *box,
-                                   u16             *video);
+                                   p3t_box         *box);
 
 #endif /* __P3T_PIXMAP_H__ */

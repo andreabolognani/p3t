@@ -201,8 +201,7 @@ p3t_pixmapGet (p3t_pixmapType  type,
 
 void
 p3t_pixmapDraw (p3t_pixmap  *self,
-                p3t_box     *box,
-                u16         *video)
+                p3t_box     *box)
 {
 	int width;
 	int height;
@@ -221,7 +220,7 @@ p3t_pixmapDraw (p3t_pixmap  *self,
 	for (y = 0; y < height; y++) {
 
 		dmaCopy ((void*) &(self->priv->data[y * width]),
-		         (void*) &video[boxX + ((y + boxY) * SCREEN_WIDTH)],
+		         (void*) &VRAM_A[boxX + ((y + boxY) * SCREEN_WIDTH)],
 		         width * 2);
 	}
 }
