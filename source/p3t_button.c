@@ -1,10 +1,33 @@
 #include <p3t_button.h>
+#include <p3t_pixmap.h>
 
 #include <stdlib.h>
 
 struct _p3t_buttonPrivate {
 	p3t_pixmapButtonType  buttonType;
 };
+
+static void
+paintCallback (p3t_widget  *widget,
+               void        *data)
+{
+	p3t_button *self;
+	p3t_pixmap *pixmap;
+	p3t_box *box;
+
+	self = P3T_BUTTON (widget);
+
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_OUTLINE,
+	                        P3T_PIXMAP_OUTLINE_BUTTON);
+	p3t_pixmapDraw (pixmap, P3T_BOX (self));
+
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_BUTTON,
+	                        p3t_buttonGetType (self));
+	box = p3t_boxNew (2, 2, 40, 40);
+	p3t_boxMakeAbsolute (box, P3T_BOX (self));
+	p3t_pixmapDraw (pixmap, box);
+	p3t_boxDestroy (box);
+}
 
 void
 _p3t_buttonInit (p3t_button            *self,
@@ -23,6 +46,10 @@ _p3t_buttonInit (p3t_button            *self,
 	priv->buttonType = buttonType;
 
 	self->priv = priv;
+
+	p3t_widgetSetPaintCallback (P3T_WIDGET (self),
+	                            &paintCallback,
+	                            NULL);
 }
 
 void

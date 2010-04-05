@@ -84,28 +84,6 @@ downButtonActivateCallback (p3t_widget  *widget,
 }
 
 static void
-buttonPaintCallback (p3t_widget  *widget,
-                     void        *data)
-{
-	p3t_button *self;
-	p3t_pixmap *pixmap;
-	p3t_box *box;
-
-	self = P3T_BUTTON (widget);
-
-	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_OUTLINE,
-	                        P3T_PIXMAP_OUTLINE_BUTTON);
-	p3t_pixmapDraw (pixmap, P3T_BOX (self));
-
-	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_BUTTON,
-	                        p3t_buttonGetType (self));
-	box = p3t_boxNew (2, 2, 40, 40);
-	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-	p3t_pixmapDraw (pixmap, box);
-	p3t_boxDestroy (box);
-}
-
-static void
 timerWidgetActivateCallback (p3t_widget  *widget,
                              void        *data)
 {
@@ -149,9 +127,6 @@ timerWidgetActivateCallback (p3t_widget  *widget,
 			p3t_widgetSetActivateCallback (P3T_WIDGET (button),
 			                               &actionButtonActivateCallback,
 			                               p3t_timerWidgetGetTimer (self));
-			p3t_widgetSetPaintCallback (P3T_WIDGET (button),
-										&buttonPaintCallback,
-										NULL);
 			application->actionButton = button;
 
 			/* Up button */
@@ -159,9 +134,6 @@ timerWidgetActivateCallback (p3t_widget  *widget,
 			p3t_widgetSetActivateCallback (P3T_WIDGET (button),
 			                               &upButtonActivateCallback,
 			                               p3t_timerWidgetGetTimer (self));
-			p3t_widgetSetPaintCallback (P3T_WIDGET (button),
-										&buttonPaintCallback,
-										NULL);
 			application->upButton = button;
 
 			/* Down button */
@@ -169,9 +141,6 @@ timerWidgetActivateCallback (p3t_widget  *widget,
 			p3t_widgetSetActivateCallback (P3T_WIDGET (button),
 			                               &downButtonActivateCallback,
 			                               p3t_timerWidgetGetTimer (self));
-			p3t_widgetSetPaintCallback (P3T_WIDGET (button),
-										&buttonPaintCallback,
-										NULL);
 			application->downButton = button;
 
 			application->state = APPLICATION_STATE_ONE;
@@ -203,68 +172,6 @@ timerWidgetActivateCallback (p3t_widget  *widget,
 			application->active = NULL;
 			break;
 	}
-}
-
-static void
-timerWidgetPaintCallback (p3t_widget  *widget,
-                          void        *data)
-{
-	p3t_timerWidget *self;
-	p3t_timer *timer;
-	p3t_pixmap *pixmap;
-	p3t_box *box;
-	char *remaining;
-
-	self = P3T_TIMERWIDGET (widget);
-	timer = p3t_timerWidgetGetTimer (self);
-	remaining = p3t_timerGetRemainingTime (timer);
-
-	/* Outline */
-	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_OUTLINE,
-	                        P3T_PIXMAP_OUTLINE_TIMERWIDGET);
-	p3t_pixmapDraw (pixmap, P3T_BOX (self));
-
-	/* Timer number */
-	box = p3t_boxNew (3, 3, 22, 26);
-	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_NUMBER,
-	                        p3t_timerGetNumber (timer) - 1);
-	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-	p3t_pixmapDraw (pixmap, box);
-	p3t_boxDestroy (box);
-
-	/* Last digit */
-	box = p3t_boxNew (98, 5, 18, 34);
-	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
-	                        remaining[4] - 48);
-	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-	p3t_pixmapDraw (pixmap, box);
-	p3t_boxDestroy (box);
-
-	/* Third digit */
-	box = p3t_boxNew (78, 5 ,18, 34);
-	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
-	                        remaining[3] - 48);
-	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-	p3t_pixmapDraw (pixmap, box);
-	p3t_boxDestroy (box);
-
-	/* Second digit */
-	box = p3t_boxNew (50, 5 ,18, 34);
-	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
-	                        remaining[1] - 48);
-	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-	p3t_pixmapDraw (pixmap, box);
-	p3t_boxDestroy (box);
-
-	/* First digit */
-	box = p3t_boxNew (30, 5 ,18, 34);
-	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
-	                        remaining[0] - 48);
-	p3t_boxMakeAbsolute (box, P3T_BOX (self));
-	p3t_pixmapDraw (pixmap, box);
-	p3t_boxDestroy (box);
-
-	free (remaining);
 }
 
 static void
@@ -300,12 +207,9 @@ init (p3t_application *self)
 
 	/* Create all the timers and assign each to its widget */
 	for (i = 0; i < TIMERS_NUMBER; i++) {
+
 		self->timers[i] = p3t_timerNew (i + 1);
 		p3t_timerWidgetSetTimer (self->widgets[i], self->timers[i]);
-
-		p3t_widgetSetPaintCallback (P3T_WIDGET (self->widgets[i]),
-		                            &timerWidgetPaintCallback,
-		                            NULL);
 		p3t_widgetSetActivateCallback (P3T_WIDGET (self->widgets[i]),
 		                               &timerWidgetActivateCallback,
 		                               self);

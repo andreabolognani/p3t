@@ -1,10 +1,73 @@
 #include <p3t_timerWidget.h>
+#include <p3t_pixmap.h>
 
 #include <stdlib.h>
 
 struct _p3t_timerWidgetPrivate {
 	p3t_timer  *timer;
 };
+
+static void
+paintCallback (p3t_widget  *widget,
+               void        *data)
+{
+	p3t_timerWidget *self;
+	p3t_timer *timer;
+	p3t_pixmap *pixmap;
+	p3t_box *box;
+	char *remaining;
+
+	self = P3T_TIMERWIDGET (widget);
+	timer = p3t_timerWidgetGetTimer (self);
+	remaining = p3t_timerGetRemainingTime (timer);
+
+	/* Outline */
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_OUTLINE,
+	                        P3T_PIXMAP_OUTLINE_TIMERWIDGET);
+	p3t_pixmapDraw (pixmap, P3T_BOX (self));
+
+	/* Timer number */
+	box = p3t_boxNew (3, 3, 22, 26);
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_NUMBER,
+	                        p3t_timerGetNumber (timer) - 1);
+	p3t_boxMakeAbsolute (box, P3T_BOX (self));
+	p3t_pixmapDraw (pixmap, box);
+	p3t_boxDestroy (box);
+
+	/* Last digit */
+	box = p3t_boxNew (98, 5, 18, 34);
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
+	                        remaining[4] - 48);
+	p3t_boxMakeAbsolute (box, P3T_BOX (self));
+	p3t_pixmapDraw (pixmap, box);
+	p3t_boxDestroy (box);
+
+	/* Third digit */
+	box = p3t_boxNew (78, 5 ,18, 34);
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
+	                        remaining[3] - 48);
+	p3t_boxMakeAbsolute (box, P3T_BOX (self));
+	p3t_pixmapDraw (pixmap, box);
+	p3t_boxDestroy (box);
+
+	/* Second digit */
+	box = p3t_boxNew (50, 5 ,18, 34);
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
+	                        remaining[1] - 48);
+	p3t_boxMakeAbsolute (box, P3T_BOX (self));
+	p3t_pixmapDraw (pixmap, box);
+	p3t_boxDestroy (box);
+
+	/* First digit */
+	box = p3t_boxNew (30, 5 ,18, 34);
+	pixmap = p3t_pixmapGet (P3T_PIXMAP_TYPE_DIGIT,
+	                        remaining[0] - 48);
+	p3t_boxMakeAbsolute (box, P3T_BOX (self));
+	p3t_pixmapDraw (pixmap, box);
+	p3t_boxDestroy (box);
+
+	free (remaining);
+}
 
 void
 _p3t_timerWidgetInit (p3t_timerWidget  *self,
@@ -22,6 +85,10 @@ _p3t_timerWidgetInit (p3t_timerWidget  *self,
 	priv->timer = NULL;
 
 	self->priv = priv;
+
+	p3t_widgetSetPaintCallback (P3T_WIDGET (self),
+	                            &paintCallback,
+	                            NULL);
 }
 
 void
