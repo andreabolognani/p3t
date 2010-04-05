@@ -282,19 +282,10 @@ init (p3t_application *self)
 
 	powerOn (POWER_ALL_2D);
 
-	vramSetBankA (VRAM_A_MAIN_BG_0x06000000);
+	videoSetMode (MODE_FB0);
+	vramSetBankA (VRAM_A_LCD);
 
-	videoSetMode (MODE_5_2D |
-	              DISPLAY_BG3_ACTIVE);
-
-	BACKGROUND.control[3] = BG_BMP16_256x256 | BG_BMP_BASE (0);
-
-	BACKGROUND.bg3_rotation.xdy = 0;
-	BACKGROUND.bg3_rotation.xdx = 1 << 8;
-	BACKGROUND.bg3_rotation.ydy = 1 << 8;
-	BACKGROUND.bg3_rotation.ydx = 0;
-
-	self->videoBuffer = (u16*) BG_BMP_RAM (0);
+	self->videoBuffer = (u16*) VRAM_A;
 
 #ifdef DEVELOPMENT_BUILD
 	consoleDemoInit ();
