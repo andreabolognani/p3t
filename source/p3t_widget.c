@@ -3,10 +3,10 @@
 #include <stdlib.h>
 
 struct _p3t_widgetPrivate {
-	p3t_widgetCallback   activateCallback;
-	void                *activateCallbackData;
-	p3t_widgetCallback   paintCallback;
-	void                *paintCallbackData;
+	p3t_widgetActivateCallback   activateCallback;
+	void                        *activateCallbackData;
+	p3t_widgetPaintCallback      paintCallback;
+	void                        *paintCallbackData;
 };
 
 void
@@ -60,48 +60,43 @@ p3t_widgetDestroy (p3t_widget *self)
 }
 
 void
-p3t_widgetSetActivateCallback (p3t_widget          *self,
-                               p3t_widgetCallback   callback,
-                               void                *data)
+p3t_widgetSetActivateCallback (p3t_widget                  *self,
+                               p3t_widgetActivateCallback   callback,
+                               void                        *data)
 {
 	self->priv->activateCallback = callback;
 	self->priv->activateCallbackData = data;
 }
 
 void
-p3t_widgetSetPaintCallback (p3t_widget          *self,
-                            p3t_widgetCallback   callback,
-                            void                *data)
+p3t_widgetSetPaintCallback (p3t_widget               *self,
+                            p3t_widgetPaintCallback   callback,
+                            void                     *data)
 {
 	self->priv->paintCallback = callback;
 	self->priv->paintCallbackData = data;
 }
 
 void
-p3t_widgetActivate (p3t_widget *self)
-{
-	p3t_widgetCallback activateCallback;
-
-	if (self->priv->activateCallback != NULL) {
-
-		activateCallback = *(self->priv->activateCallback);
-		activateCallback (self, self->priv->activateCallbackData);
-	}
-}
-
-void
 p3t_widgetTryActivate (p3t_widget  *self,
                        p3t_point   *point)
 {
+	p3t_widgetActivateCallback activateCallback;
+
 	if (p3t_boxContainsPoint (P3T_BOX (self), point)) {
-		p3t_widgetActivate (self);
+
+		if (self->priv->activateCallback != NULL) {
+
+			activateCallback = *(self->priv->activateCallback);
+			activateCallback (self, point, self->priv->activateCallbackData);
+		}
 	}
 }
 
 void
 p3t_widgetPaint (p3t_widget *self)
 {
-	p3t_widgetCallback paintCallback;
+	p3t_widgetPaintCallback paintCallback;
 
 	if (self->priv->paintCallback != NULL) {
 

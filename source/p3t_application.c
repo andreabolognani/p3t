@@ -34,6 +34,7 @@ struct _p3t_applicationPrivate {
 
 static void
 actionButtonActivateCallback (p3t_widget  *widget,
+                              p3t_point   *stylus,
                               void        *data)
 {
 	p3t_timer *timer;
@@ -62,6 +63,7 @@ actionButtonActivateCallback (p3t_widget  *widget,
 
 static void
 upButtonActivateCallback (p3t_widget  *widget,
+                          p3t_point   *stylus,
                           void        *data)
 {
 	p3t_timer *timer;
@@ -73,6 +75,7 @@ upButtonActivateCallback (p3t_widget  *widget,
 
 static void
 downButtonActivateCallback (p3t_widget  *widget,
+                            p3t_point   *stylus,
                             void        *data)
 {
 	p3t_timer *timer;
@@ -84,6 +87,7 @@ downButtonActivateCallback (p3t_widget  *widget,
 
 static void
 timerWidgetActivateCallback (p3t_widget  *widget,
+                             p3t_point   *stylus,
                              void        *data)
 {
 	p3t_timerWidget *self;
