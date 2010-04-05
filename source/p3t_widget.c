@@ -1,6 +1,7 @@
 #include <p3t_widget.h>
 
 #include <stdlib.h>
+#include <nds.h>
 
 struct _p3t_widgetPrivate {
 	p3t_widgetActivateCallback   activateCallback;
@@ -97,6 +98,19 @@ void
 p3t_widgetPaint (p3t_widget *self)
 {
 	p3t_widgetPaintCallback paintCallback;
+	int x;
+	int y;
+
+	x = p3t_boxGetX (P3T_BOX (self));
+	y = p3t_boxGetY (P3T_BOX (self));
+
+	/* Don't waste time painting an off-screen widget */
+	if (x < 0 || x >= SCREEN_WIDTH) {
+		return;
+	}
+	if (y < 0 || y >= SCREEN_HEIGHT) {
+		return;
+	}
 
 	if (self->priv->paintCallback != NULL) {
 
