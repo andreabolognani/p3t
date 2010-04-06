@@ -48,7 +48,7 @@
 #include <outlineTimerWidget.h>
 #include <outlineButton.h>
 
-#include <background.h>
+#include <backgroundDefault.h>
 
 #define TYPES_NUMBER 5
 
@@ -402,7 +402,7 @@ backgroundInfo (int     identifier,
 	switch (identifier) {
 
 		case P3T_PIXMAP_BACKGROUND_DEFAULT:
-			*data = (u16*) backgroundBitmap;
+			*data = (u16*) backgroundDefaultBitmap;
 			break;
 	}
 }
