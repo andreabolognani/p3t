@@ -203,6 +203,11 @@ p3t_timerStart (p3t_timer *self)
 	    self->state != P3T_TIMER_STATE_PAUSED)
 		return;
 
+	/* Don't start if the target time is 0 seconds */
+	if (self->targetSeconds <= 0) {
+		return;
+	} 
+
 	self->startSeconds = p3t_clockGetSeconds ();
 
 	self->state = P3T_TIMER_STATE_RUNNING;
