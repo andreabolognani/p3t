@@ -17,10 +17,14 @@
  */
 
 #include <nds.h>
+#include <maxmod9.h>
 
 #include <p3t_clock.h>
 #include <p3t_application.h>
 #include <p3t_point.h>
+
+#include <soundbank.h>
+#include <soundbank_bin.h>
 
 int
 main (void)
@@ -30,8 +34,20 @@ main (void)
 	touchPosition touch;
 	int keys;
 
-	p3t_clockInit ();
+	powerOn (POWER_ALL_2D | PM_SOUND_AMP | PM_BACKLIGHT_BOTTOM);
 
+	videoSetMode (MODE_FB0);
+	vramSetBankA (VRAM_A_LCD);
+
+#ifdef DEVELOPMENT_BUILD
+	consoleDemoInit ();
+#endif
+
+	lcdMainOnBottom ();
+
+	mmInitDefaultMem ((mm_addr) soundbank_bin);
+
+	p3t_clockInit ();
 	application = p3t_applicationNew ();
 
 	while (1) {

@@ -17,6 +17,7 @@
  */
 
 #include <p3t_application.h>
+#include <p3t_clock.h>
 #include <p3t_timer.h>
 #include <p3t_point.h>
 #include <p3t_box.h>
@@ -26,10 +27,6 @@
 
 #include <stdlib.h>
 #include <nds.h>
-#include <maxmod9.h>
-
-#include <soundbank.h>
-#include <soundbank_bin.h>
 
 #define TIMERS_NUMBER      8
 #define SECONDS_PER_MINUTE 60
@@ -288,19 +285,6 @@ _p3t_applicationInit (p3t_application *self)
 {
 	p3t_applicationPrivate *priv;
 	int i;
-
-	powerOn (POWER_ALL_2D);
-
-	videoSetMode (MODE_FB0);
-	vramSetBankA (VRAM_A_LCD);
-
-#ifdef DEVELOPMENT_BUILD
-	consoleDemoInit ();
-#endif
-
-	lcdMainOnBottom ();
-
-	mmInitDefaultMem ((mm_addr) soundbank_bin);
 
 	_p3t_widgetInit (P3T_WIDGET (self), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
