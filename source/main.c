@@ -63,6 +63,7 @@ main (void)
 			stylus = p3t_pointNew (touch.px, touch.py);
 		}
 
+		p3t_applicationUpdate (application);
 		p3t_widgetTryActivate (P3T_WIDGET (application), stylus);
 		p3t_widgetPaint (P3T_WIDGET (application));
 

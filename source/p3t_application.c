@@ -99,25 +99,10 @@ activateCallback (p3t_widget  *widget,
 {
 	p3t_application *self;
 	p3t_applicationPrivate *priv;
-	p3t_timer *timer;
-	int elapsed;
-	int target;
 	int i;
 
 	self = P3T_APPLICATION (widget);
 	priv = self->priv;
-
-	for (i = 0; i < TIMERS_NUMBER; i++) {
-
-		timer = priv->timers[i];
-
-		elapsed = p3t_timerGetElapsedSeconds (timer);
-		target = p3t_timerGetTargetSeconds (timer);
-
-		if (elapsed >= target) {
-			p3t_timerFinish (timer);
-		}
-	}
 
 	for (i = 0; i < TIMERS_NUMBER; i++) {
 		p3t_widgetTryActivate (P3T_WIDGET (priv->widgets[i]),
@@ -381,3 +366,23 @@ p3t_applicationDestroy (p3t_application *self)
 	free (self);
 }
 
+void
+p3t_applicationUpdate (p3t_application *self)
+{
+	p3t_timer *timer;
+	int elapsed;
+	int target;
+	int i;
+
+	for (i = 0; i < TIMERS_NUMBER; i++) {
+
+		timer = self->priv->timers[i];
+
+		elapsed = p3t_timerGetElapsedSeconds (timer);
+		target = p3t_timerGetTargetSeconds (timer);
+
+		if (elapsed >= target) {
+			p3t_timerFinish (timer);
+		}
+	}
+}
