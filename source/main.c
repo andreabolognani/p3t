@@ -35,6 +35,9 @@ main (void)
 	int keys;
 
 	powerOn (POWER_ALL_2D | PM_SOUND_AMP | PM_BACKLIGHT_BOTTOM);
+#ifndef DEVELOPMENT_BUILD
+	powerOff (PM_BACKLIGHT_TOP);
+#endif
 
 	videoSetMode (MODE_FB0);
 	vramSetBankA (VRAM_A_LCD);
