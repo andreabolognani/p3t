@@ -16,7 +16,8 @@ include $(DEVKITARM)/ds_rules
 # DATA is a list of directories containing binary files embedded using bin2o
 # GRAPHICS is a list of directories containing image files to be converted with grit
 #---------------------------------------------------------------------------------
-TARGET		:=	p3t
+VERSION		:=  1.0.0
+TARGET		:=	p3t-$(VERSION)
 BUILD		:=	build
 SOURCES		:=	source
 INCLUDES	:=	include
