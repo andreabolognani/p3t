@@ -1,4 +1,4 @@
-/* P3T - Simple timers for Nintendo DS
+/* P3T - Coundown timers for Nintendo DS
  * Copyright (C) 2010  Andrea Bolognani <eof@kiyuko.org>
  *
  * This program is free software; you can redistribute it and/or modify

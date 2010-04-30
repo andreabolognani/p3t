@@ -1,5 +1,5 @@
-P3T - Simple timers for Nintendo DS
-===================================
+P3T - Countdown timers for Nintendo DS
+======================================
 P3T provides a bunch of independent countdown timers, which can be
 started, stopped and programmed individually. A sound is emitted when
 a timer reaches the end of its countdown.
