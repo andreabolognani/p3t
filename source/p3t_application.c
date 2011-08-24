@@ -30,6 +30,7 @@
 
 #define TIMERS_NUMBER      8
 #define SECONDS_PER_MINUTE 60
+#define BACKLIGHT_TIMEOUT  30
 
 typedef enum {
 	APPLICATION_STATE_ALL,
@@ -45,6 +46,8 @@ struct _p3t_applicationPrivate {
 	p3t_button         *downButton;
 	applicationState    state;
 	applicationState    lastState;
+	int                 idle;
+	int                 lastActivity;
 };
 
 static void
@@ -103,6 +106,23 @@ activateCallback (p3t_widget  *widget,
 
 	self = P3T_APPLICATION (widget);
 	priv = self->priv;
+
+	/* Update the idle counter */
+	priv->lastActivity = p3t_clockGetSeconds ();
+
+	if (priv->idle) {
+
+		/* Turn the backlight on */
+		priv->idle = 0;
+		powerOn (PM_BACKLIGHT_BOTTOM);
+
+#ifdef DEVELOPMENT_BUILD
+		printf ("[%d] Backlight ON\n",
+		        p3t_clockGetSeconds ());
+#endif
+
+		return;
+	}
 
 	for (i = 0; i < TIMERS_NUMBER; i++) {
 		p3t_widgetTryActivate (P3T_WIDGET (priv->widgets[i]),
@@ -306,6 +326,9 @@ _p3t_applicationInit (p3t_application *self)
 	priv->state = APPLICATION_STATE_ALL;
 	priv->lastState = APPLICATION_STATE_ONE;
 
+	priv->idle = 0;
+	priv->lastActivity = p3t_clockGetSeconds ();
+
 	self->priv = priv;
 
 	p3t_widgetSetPaintCallback (P3T_WIDGET (self),
@@ -369,14 +392,29 @@ p3t_applicationDestroy (p3t_application *self)
 void
 p3t_applicationUpdate (p3t_application *self)
 {
+	p3t_applicationPrivate *priv;
 	p3t_timer *timer;
 	int elapsed;
 	int target;
 	int i;
 
+	priv = self->priv;
+
+	if ((p3t_clockGetSeconds () - priv->lastActivity) >= BACKLIGHT_TIMEOUT) {
+
+		/* Turn backlight off */
+		priv->idle = 1;
+		powerOff (PM_BACKLIGHT_BOTTOM);
+
+#ifdef DEVELOPMENT_BUILD
+		printf ("[%d] Backlight OFF\n",
+		        p3t_clockGetSeconds ());
+#endif
+	}
+
 	for (i = 0; i < TIMERS_NUMBER; i++) {
 
-		timer = self->priv->timers[i];
+		timer = priv->timers[i];
 
 		elapsed = p3t_timerGetElapsedSeconds (timer);
 		target = p3t_timerGetTargetSeconds (timer);
