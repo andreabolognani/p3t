@@ -63,6 +63,12 @@ paintCallback (p3t_widget  *widget,
 	self = P3T_APPLICATION (widget);
 	priv = self->priv;
 
+	/* It doesn't make much sense to paint stuff to the
+	 * screen while the backlight is off, does it? */
+	if (priv->idle) {
+		return;
+	}
+
 	/* There's no need to paint the background every single
 	 * vblank, just draw it when the mode changes */
 	if (priv->state != priv->lastState) {
