@@ -1,0 +1,5 @@
+Overview of changes from P3T 1.0.0 to 1.0.1
+===========================================
+
+  [Bug fixes]
+    * Correctly decrease target time when the timer is running.

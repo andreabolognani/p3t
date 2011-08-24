@@ -169,11 +169,8 @@ p3t_timerGetRemainingTime (p3t_timer *self)
 void
 p3t_timerIncreaseTargetTime (p3t_timer *self)
 {
-	/* If the timer is running, set the target time to the
-	 * remaining time */
-	if (p3t_timerGetElapsedSeconds (self) > 0) {
-		self->targetSeconds = p3t_timerGetRemainingSeconds (self);
-	}
+	/* Set the target time to the remaining time */
+	self->targetSeconds = p3t_timerGetRemainingSeconds (self);
 
 	/* Stop the timer if it's not stopped already */
 	if (self->state != P3T_TIMER_STATE_STOPPED) {
@@ -193,6 +190,9 @@ p3t_timerIncreaseTargetTime (p3t_timer *self)
 void
 p3t_timerDecreaseTargetTime (p3t_timer *self)
 {
+	/* Set the target time to the remaining time */
+	self->targetSeconds = p3t_timerGetRemainingSeconds (self);
+
 	/* Stop the timer if it's not stopped already */
 	if (self->state != P3T_TIMER_STATE_STOPPED) {
 		p3t_timerStop (self);
@@ -202,7 +202,7 @@ p3t_timerDecreaseTargetTime (p3t_timer *self)
 	 * and from the beginning of a minute to the beginning of the
 	 * previous minute */
 	if ((self->targetSeconds % SECONDS_PER_MINUTE) > 0) {
-		self->targetSeconds -= (self->targetSeconds);
+		self->targetSeconds -= (self->targetSeconds % SECONDS_PER_MINUTE);
 	}
 	else {
 		self->targetSeconds -= SECONDS_PER_MINUTE;
@@ -224,7 +224,7 @@ p3t_timerStart (p3t_timer *self)
 	/* Don't start if the target time is 0 seconds */
 	if (self->targetSeconds <= 0) {
 		return;
-	} 
+	}
 
 	self->startSeconds = p3t_clockGetSeconds ();
 
