@@ -154,6 +154,10 @@ _p3t_pixmapInit (p3t_pixmap      *self,
 	int width;
 	int height;
 
+	data = NULL;
+	width = 0;
+	height = 0;
+
 	/* Boring switch stuff */
 	switch (type) {
 
@@ -226,7 +230,7 @@ p3t_pixmapDraw (p3t_pixmap  *self,
 	int boxX;
 	int boxY;
 	int y;
-	
+
 	boxX = p3t_boxGetX (box);
 	boxY = p3t_boxGetY (box);
 
