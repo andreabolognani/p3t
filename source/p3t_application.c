@@ -38,7 +38,6 @@ typedef enum {
 } applicationState;
 
 struct _p3t_applicationPrivate {
-	p3t_timer         **timers;
 	p3t_timerWidget   **widgets;
 	p3t_timerWidget    *active;
 	p3t_button         *actionButton;
@@ -286,13 +285,13 @@ void
 _p3t_applicationInit (p3t_application *self)
 {
 	p3t_applicationPrivate *priv;
+	p3t_timer *timer;
 	int i;
 
 	_p3t_widgetInit (P3T_WIDGET (self), 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	priv = malloc (sizeof (p3t_applicationPrivate));
 
-	priv->timers = malloc (TIMERS_NUMBER * sizeof (p3t_timer *));
 	priv->widgets = malloc (TIMERS_NUMBER * sizeof (p3t_timerWidget *));
 
 	/* Create all the widgets */
@@ -308,8 +307,8 @@ _p3t_applicationInit (p3t_application *self)
 	/* Create all the timers and assign each to its widget */
 	for (i = 0; i < TIMERS_NUMBER; i++) {
 
-		priv->timers[i] = p3t_timerNew (i + 1);
-		p3t_timerWidgetSetTimer (priv->widgets[i], priv->timers[i]);
+		timer = p3t_timerNew (i + 1);
+		p3t_timerWidgetSetTimer (priv->widgets[i], timer);
 		p3t_widgetSetActivateCallback (P3T_WIDGET (priv->widgets[i]),
 		                               &timerWidgetActivateCallback,
 		                               self);
@@ -360,7 +359,6 @@ _p3t_applicationFinalize (p3t_application *self)
 	}
 
 	/* Destroy containers */
-	free (priv->timers);
 	free (priv->widgets);
 
 	free (priv);
@@ -399,7 +397,7 @@ p3t_applicationUpdate (p3t_application *self)
 
 	for (i = 0; i < TIMERS_NUMBER; i++) {
 
-		timer = priv->timers[i];
+		timer = p3t_timerWidgetGetTimer (priv->widgets[i]);
 
 		elapsed = p3t_timerGetElapsedSeconds (timer);
 		target = p3t_timerGetTargetSeconds (timer);
