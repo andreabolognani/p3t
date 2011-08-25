@@ -116,17 +116,8 @@ activateCallback (p3t_widget  *widget,
 	/* Update the idle counter */
 	priv->lastActivity = p3t_clockGetSeconds ();
 
+	/* If the system is idle, drop this touch event */
 	if (priv->idle) {
-
-		/* Turn the backlight on */
-		priv->idle = 0;
-		powerOn (PM_BACKLIGHT_BOTTOM);
-
-#ifdef DEVELOPMENT_BUILD
-		printf ("[%d] Backlight ON\n",
-		        p3t_clockGetSeconds ());
-#endif
-
 		return;
 	}
 
@@ -406,18 +397,6 @@ p3t_applicationUpdate (p3t_application *self)
 
 	priv = self->priv;
 
-	if ((p3t_clockGetSeconds () - priv->lastActivity) >= BACKLIGHT_TIMEOUT) {
-
-		/* Turn backlight off */
-		priv->idle = 1;
-		powerOff (PM_BACKLIGHT_BOTTOM);
-
-#ifdef DEVELOPMENT_BUILD
-		printf ("[%d] Backlight OFF\n",
-		        p3t_clockGetSeconds ());
-#endif
-	}
-
 	for (i = 0; i < TIMERS_NUMBER; i++) {
 
 		timer = priv->timers[i];
@@ -426,7 +405,42 @@ p3t_applicationUpdate (p3t_application *self)
 		target = p3t_timerGetTargetSeconds (timer);
 
 		if (elapsed >= target) {
+
 			p3t_timerFinish (timer);
+
+			/* Turn the backlight on when a timer reaches the end
+			 * of its countdown */
+			priv->lastActivity = p3t_clockGetSeconds ();
+		}
+	}
+
+	/* Backlight management logic */
+	if ((p3t_clockGetSeconds () - priv->lastActivity) >= BACKLIGHT_TIMEOUT) {
+
+		if (!priv->idle) {
+
+			/* Turn backlight off */
+			priv->idle = 1;
+			powerOff (PM_BACKLIGHT_BOTTOM);
+
+#ifdef DEVELOPMENT_BUILD
+			printf ("[%d] Backlight OFF\n",
+			        p3t_clockGetSeconds ());
+#endif
+		}
+	}
+	else {
+
+		if (priv->idle) {
+
+			/* Turn the backlight on */
+			priv->idle = 0;
+			powerOn (PM_BACKLIGHT_BOTTOM);
+
+#ifdef DEVELOPMENT_BUILD
+			printf ("[%d] Backlight ON\n",
+			        p3t_clockGetSeconds ());
+#endif
 		}
 	}
 }
