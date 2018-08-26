@@ -29,4 +29,5 @@ task clean(type: Delete) {
 ext {
     supportLibraryVersion = "27.1.1"
     constraintLayoutVersion = "1.1.2"
+    archLifecycleVersion = "1.1.1"
 }

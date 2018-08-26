@@ -17,20 +17,107 @@
 
 package org.kiyuko.p3t;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Build;
+import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatImageButton;
 import android.view.View;
+import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.HashMap;
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private TimerViewModel mViewModel;
+    private LiveData<HashMap<Integer, TimerState>> mAllTimerState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mViewModel = ViewModelProviders.of(this).get(TimerViewModel.class);
+        mAllTimerState = mViewModel.getAllTimerState();
+
+        initializeInterface();
+
+        mAllTimerState.observe(this, new Observer<HashMap<Integer, TimerState>>() {
+            @Override
+            public void onChanged(@Nullable HashMap<Integer, TimerState> allTimerState) {
+                if (allTimerState != null) {
+                    updateInterface(allTimerState);
+                }
+            }
+        });
+
         hideSystemUI();
+    }
+
+    public void initializeInterface() {
+
+        int count = getResources().getInteger(R.integer.timerCount);
+
+        for (int i = 1; i <= count; i++) {
+
+            String viewName = String.format("timer%d", i);
+            int viewId = getResources().getIdentifier(viewName, "id", getPackageName());
+
+            View view = findViewById(viewId);
+            TextView label = view.findViewById(R.id.label);
+
+            // Setting the view's ID to match the corresponding timer's will
+            // allow us to look it up more conveniently later
+            view.setId(i);
+            label.setText(String.format("%d", i));
+
+            AppCompatImageButton upButton = view.findViewById(R.id.upButton);
+            upButton.setOnClickListener(this);
+
+            AppCompatImageButton downButton = view.findViewById(R.id.downButton);
+            downButton.setOnClickListener(this);
+
+            AppCompatImageButton actionButton = view.findViewById(R.id.actionButton);
+            actionButton.setOnClickListener(this);
+        }
+    }
+
+    public void updateInterface(HashMap<Integer, TimerState> allTimerState) {
+
+        for (TimerState state: allTimerState.values()) {
+
+            View view = findViewById(state.getId());
+            TextView time = view.findViewById(R.id.time);
+
+            DisplayTime displayTime = new DisplayTime(state.getCurrentTime());
+            time.setText(displayTime.toString());
+        }
+    }
+
+    @Override
+    public void onClick(View button) {
+        View view = (View) button.getParent();
+
+        TimerState state = new TimerState(view.getId());
+
+        switch (button.getId()) {
+            case R.id.upButton: {
+                mViewModel.up(state);
+                break;
+            }
+            case R.id.downButton: {
+                mViewModel.down(state);
+                break;
+            }
+            case R.id.actionButton: {
+                mViewModel.action(state);
+                break;
+            }
+        }
     }
 
     @Override
