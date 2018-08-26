@@ -36,7 +36,7 @@ public class TimerViewModel extends AndroidViewModel {
         int count = application.getResources().getInteger(R.integer.timerCount);
         int targetTimeAsMinutes = application.getResources().getInteger(R.integer.timerTargetTimeAsMinutes);
 
-        mRunner = TimerRunner.getRunner(count, targetTimeAsMinutes);
+        mRunner = TimerRunner.getRunner(application, count, targetTimeAsMinutes);
         mAllTimerState = mRunner.getAllTimerState();
     }
 

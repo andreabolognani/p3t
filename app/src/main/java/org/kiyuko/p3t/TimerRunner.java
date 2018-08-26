@@ -17,7 +17,9 @@
 
 package org.kiyuko.p3t;
 
+import android.app.Application;
 import android.arch.lifecycle.LiveData;
+import android.media.MediaPlayer;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -30,23 +32,33 @@ public class TimerRunner extends TimerTask {
 
     private static TimerRunner INSTANCE;
 
+    private Application mApplication;
+    private MediaPlayer[] mMediaPlayers;
+
     private LiveDataWrapper mAllTimerState;
     private long mLastUpdate;
     private Timer mTimer;
 
-    public static TimerRunner getRunner(int count, int targetTimeAsMinutes) {
+    public static TimerRunner getRunner(Application application, int count, int targetTimeAsMinutes) {
         if (INSTANCE == null) {
             synchronized (TimerRunner.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new TimerRunner(count, targetTimeAsMinutes);
+                    INSTANCE = new TimerRunner(application, count, targetTimeAsMinutes);
                 }
             }
         }
         return INSTANCE;
     }
 
-    private TimerRunner(int count, int targetTimeAsMinutes) {
+    private TimerRunner(Application application, int count, int targetTimeAsMinutes) {
         mAllTimerState = new LiveDataWrapper(count, targetTimeAsMinutes);
+
+        mApplication = application;
+
+        mMediaPlayers = new MediaPlayer[count + 1];
+        for (int i = 1; i <= count; i++) {
+            mMediaPlayers[i] = MediaPlayer.create(mApplication, R.raw.finish);
+        }
 
         mLastUpdate = new Date().getTime();
         mTimer = new Timer();
@@ -59,6 +71,8 @@ public class TimerRunner extends TimerTask {
 
     public void up(TimerState state) {
         state = mAllTimerState.getValue().get(state.getId());
+
+        stopSound(state);
 
         DisplayTime displayTime = new DisplayTime(state.getCurrentTime());
         int minutes = displayTime.getMinutes();
@@ -81,6 +95,8 @@ public class TimerRunner extends TimerTask {
 
     public void down(TimerState state) {
         state = mAllTimerState.getValue().get(state.getId());
+
+        stopSound(state);
 
         DisplayTime displayTime = new DisplayTime(state.getCurrentTime());
         int minutes = displayTime.getMinutes();
@@ -107,6 +123,8 @@ public class TimerRunner extends TimerTask {
 
     public void action(TimerState state) {
         state = mAllTimerState.getValue().get(state.getId());
+
+        stopSound(state);
 
         switch (state.getStatus()) {
             case STOPPED: {
@@ -151,6 +169,8 @@ public class TimerRunner extends TimerTask {
                 if (currentTime <= 0) {
                     state.setStatus(TimerState.Status.FINISHED);
                     state.setCurrentTime(0);
+
+                    startSound(state);
                 }
             }
         }
@@ -158,6 +178,23 @@ public class TimerRunner extends TimerTask {
         mLastUpdate = now;
 
         mAllTimerState.post();
+    }
+
+    public void startSound(TimerState state) {
+        MediaPlayer mediaPlayer = mMediaPlayers[state.getId()];
+
+        mediaPlayer.start();
+    }
+
+    public void stopSound(TimerState state) {
+        MediaPlayer mediaPlayer = mMediaPlayers[state.getId()];
+
+        if (mediaPlayer.isPlaying()) {
+            try {
+                mediaPlayer.stop();
+                mediaPlayer.prepare();
+            } catch (Exception e) {}
+        }
     }
 
     private class LiveDataWrapper extends LiveData<HashMap<Integer, TimerState>> {
