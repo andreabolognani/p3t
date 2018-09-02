@@ -19,7 +19,9 @@ package org.kiyuko.p3t;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
+import android.content.Context;
 import android.media.MediaPlayer;
+import android.os.PowerManager;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -34,6 +36,7 @@ public class TimerRunner extends TimerTask {
 
     private Application mApplication;
     private MediaPlayer[] mMediaPlayers;
+    private PowerManager.WakeLock[] mWakeLocks;
 
     private LiveDataWrapper mAllTimerState;
     private long mLastUpdate;
@@ -58,6 +61,14 @@ public class TimerRunner extends TimerTask {
         mMediaPlayers = new MediaPlayer[count + 1];
         for (int i = 1; i <= count; i++) {
             mMediaPlayers[i] = MediaPlayer.create(mApplication, R.raw.finish);
+        }
+
+        PowerManager powerManager = (PowerManager) mApplication.getSystemService(Context.POWER_SERVICE);
+
+        mWakeLocks = new PowerManager.WakeLock[count + 1];
+        for (int i = 1; i <= count; i++) {
+            String tag = String.format("org.kiyuko.p3t/%d", count);
+            mWakeLocks[i] = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, tag);
         }
 
         mLastUpdate = new Date().getTime();
@@ -129,19 +140,23 @@ public class TimerRunner extends TimerTask {
         switch (state.getStatus()) {
             case STOPPED: {
                 state.setStatus(TimerState.Status.RUNNING);
+                mWakeLocks[state.getId()].acquire();
                 break;
             }
             case RUNNING: {
                 state.setStatus(TimerState.Status.PAUSED);
+                mWakeLocks[state.getId()].release();
                 break;
             }
             case PAUSED: {
                 state.setStatus(TimerState.Status.RUNNING);
+                mWakeLocks[state.getId()].acquire();
                 break;
             }
             case FINISHED: {
                 state.setStatus(TimerState.Status.STOPPED);
                 state.setCurrentTime(state.getTargetTime());
+                mWakeLocks[state.getId()].release();
                 break;
             }
         }
