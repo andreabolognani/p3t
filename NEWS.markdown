@@ -1,3 +1,14 @@
+P3T 2.0.0
+=========
+
+Released on 2018-09-22.
+
+Target platforms
+----------------
+
+  * Run on Android devices instead of Nintendo DS consoles.
+
+
 P3T 1.2.0
 =========
 
