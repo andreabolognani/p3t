@@ -1,1 +1,4 @@
-Andrea Bolognani <eof@kiyuko.org>
+Authors
+=======
+
+  * Andrea Bolognani <eof@kiyuko.org>
