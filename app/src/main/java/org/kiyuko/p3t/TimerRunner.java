@@ -69,7 +69,7 @@ public class TimerRunner extends TimerTask {
 
         mWakeLocks = new PowerManager.WakeLock[count + 1];
         for (int i = 1; i <= count; i++) {
-            String tag = String.format("org.kiyuko.p3t/%d", count);
+            String tag = String.format("org.kiyuko.p3t:timer/%d", count);
             mWakeLocks[i] = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, tag);
         }
 
