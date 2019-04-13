@@ -21,12 +21,14 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Build;
+import android.os.PowerManager;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatImageButton;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -51,6 +53,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onChanged(@Nullable ApplicationState applicationState) {
                 if (applicationState != null) {
                     updateInterface(applicationState);
+                }
+            }
+        });
+
+        // We need to use observeForever() here because otherwise we would not get updates
+        // while the screen is off, which would completely defeat the purpose
+        mApplicationState.observeForever(new Observer<ApplicationState>() {
+            @Override
+            public void onChanged(@Nullable ApplicationState applicationState) {
+                if (applicationState != null) {
+                    updateScreenStatus(applicationState);
                 }
             }
         });
@@ -95,6 +108,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             DisplayTime displayTime = new DisplayTime(state.getCurrentTime());
             time.setText(displayTime.toString());
+        }
+    }
+
+    private void updateScreenStatus(ApplicationState applicationState) {
+
+        int windowFlags = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+        int wakeLockFlags = PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP;
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
+            windowFlags = windowFlags |
+                          WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                          WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
+        }
+
+        if (applicationState.getUserAttentionNeeded()) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                setShowWhenLocked(true);
+                setTurnScreenOn(true);
+            }
+
+            getWindow().addFlags(windowFlags);
+
+            // We need to acquire a wakelock if we want the screen to actually turn on.
+            // We can release it immediately afterwards, though
+            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+            PowerManager.WakeLock wakeLock = powerManager.newWakeLock(wakeLockFlags, "org.kiyuko.p3t:screen");
+            wakeLock.acquire();
+            wakeLock.release();
+        } else {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                setShowWhenLocked(false);
+                setTurnScreenOn(false);
+            }
+
+            getWindow().clearFlags(windowFlags);
         }
     }
 
