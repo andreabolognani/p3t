@@ -195,13 +195,13 @@ public class TimerRunner extends TimerTask {
         mAllTimerState.post();
     }
 
-    public void startSound(TimerState state) {
+    private void startSound(TimerState state) {
         MediaPlayer mediaPlayer = mMediaPlayers[state.getId()];
 
         mediaPlayer.start();
     }
 
-    public void stopSound(TimerState state) {
+    private void stopSound(TimerState state) {
         MediaPlayer mediaPlayer = mMediaPlayers[state.getId()];
 
         if (mediaPlayer.isPlaying()) {

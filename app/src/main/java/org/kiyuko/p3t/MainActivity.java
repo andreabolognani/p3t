@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         hideSystemUI();
     }
 
-    public void initializeInterface() {
+    private void initializeInterface() {
 
         int count = getResources().getInteger(R.integer.timerCount);
 
@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public void updateInterface(HashMap<Integer, TimerState> allTimerState) {
+    private void updateInterface(HashMap<Integer, TimerState> allTimerState) {
 
         for (TimerState state: allTimerState.values()) {
 
