@@ -21,14 +21,12 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 
-import java.util.HashMap;
-
 public class TimerViewModel extends AndroidViewModel {
 
     private static String TAG = "app/TimerViewModel";
 
     private TimerRunner mRunner;
-    private LiveData<HashMap<Integer, TimerState>> mAllTimerState;
+    private LiveData<ApplicationState> mApplicationState;
 
     public TimerViewModel(Application application) {
         super(application);
@@ -37,11 +35,11 @@ public class TimerViewModel extends AndroidViewModel {
         int targetTimeAsMinutes = application.getResources().getInteger(R.integer.timerTargetTimeAsMinutes);
 
         mRunner = TimerRunner.getRunner(application, count, targetTimeAsMinutes);
-        mAllTimerState = mRunner.getAllTimerState();
+        mApplicationState = mRunner.getApplicationState();
     }
 
-    public LiveData<HashMap<Integer, TimerState>> getAllTimerState() {
-        return mAllTimerState;
+    public LiveData<ApplicationState> getApplicationState() {
+        return mApplicationState;
     }
 
     public void up(TimerState state) {

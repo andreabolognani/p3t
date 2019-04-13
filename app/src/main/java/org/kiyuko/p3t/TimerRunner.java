@@ -24,7 +24,6 @@ import android.media.MediaPlayer;
 import android.os.PowerManager;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,7 +39,7 @@ public class TimerRunner extends TimerTask {
     private MediaPlayer[] mMediaPlayers;
     private PowerManager.WakeLock[] mWakeLocks;
 
-    private LiveDataWrapper mAllTimerState;
+    private LiveDataWrapper mApplicationState;
     private long mLastUpdate;
     private Timer mTimer;
 
@@ -56,7 +55,7 @@ public class TimerRunner extends TimerTask {
     }
 
     private TimerRunner(Application application, int count, int targetTimeAsMinutes) {
-        mAllTimerState = new LiveDataWrapper(count, targetTimeAsMinutes);
+        mApplicationState = new LiveDataWrapper(count, targetTimeAsMinutes);
 
         mApplication = application;
 
@@ -78,12 +77,12 @@ public class TimerRunner extends TimerTask {
         mTimer.scheduleAtFixedRate(this, 0, UPDATE_PERIOD);
     }
 
-    public LiveData<HashMap<Integer, TimerState>> getAllTimerState() {
-        return mAllTimerState;
+    public LiveData<ApplicationState> getApplicationState() {
+        return mApplicationState;
     }
 
     public void up(TimerState state) {
-        state = mAllTimerState.getValue().get(state.getId());
+        state = mApplicationState.getValue().getAllTimerState().get(state.getId());
 
         stopSound(state);
 
@@ -103,11 +102,11 @@ public class TimerRunner extends TimerTask {
         state.setTargetTimeAsMinutes(minutes);
         state.setCurrentTime(state.getTargetTime());
 
-        mAllTimerState.post();
+        mApplicationState.post();
     }
 
     public void down(TimerState state) {
-        state = mAllTimerState.getValue().get(state.getId());
+        state = mApplicationState.getValue().getAllTimerState().get(state.getId());
 
         stopSound(state);
 
@@ -131,11 +130,11 @@ public class TimerRunner extends TimerTask {
         state.setTargetTimeAsMinutes(minutes);
         state.setCurrentTime(state.getTargetTime());
 
-        mAllTimerState.post();
+        mApplicationState.post();
     }
 
     public void action(TimerState state) {
-        state = mAllTimerState.getValue().get(state.getId());
+        state = mApplicationState.getValue().getAllTimerState().get(state.getId());
 
         stopSound(state);
 
@@ -163,20 +162,20 @@ public class TimerRunner extends TimerTask {
             }
         }
 
-        mAllTimerState.post();
+        mApplicationState.post();
     }
 
     @Override
     public void run() {
-        HashMap<Integer, TimerState> allTimerState = mAllTimerState.getValue();
+        ApplicationState applicationState = mApplicationState.getValue();
 
-        if (allTimerState == null) {
+        if (applicationState == null) {
             return;
         }
 
         long now = new Date().getTime();
 
-        for (TimerState state: allTimerState.values()) {
+        for (TimerState state: applicationState.getAllTimerState().values()) {
             if (state.getStatus() == TimerState.Status.RUNNING) {
                 int currentTime = state.getCurrentTime();
 
@@ -194,7 +193,7 @@ public class TimerRunner extends TimerTask {
 
         mLastUpdate = now;
 
-        mAllTimerState.post();
+        mApplicationState.post();
     }
 
     private void startSound(TimerState state) {
@@ -214,27 +213,17 @@ public class TimerRunner extends TimerTask {
         }
     }
 
-    private class LiveDataWrapper extends LiveData<HashMap<Integer, TimerState>> {
-        private HashMap<Integer, TimerState> mAllTimerState;
+    private class LiveDataWrapper extends LiveData<ApplicationState> {
+
+        private ApplicationState mApplicationState;
 
         public LiveDataWrapper(int count, int targetTimeAsMinutes) {
-            mAllTimerState = new HashMap<>();
-
-            for (int i = 1; i <= count; i++) {
-                TimerState state = new TimerState(i);
-
-                state.setStatus(TimerState.Status.STOPPED);
-                state.setTargetTimeAsMinutes(targetTimeAsMinutes);
-                state.setCurrentTime(state.getTargetTime());
-
-                mAllTimerState.put(i, state);
-            }
-
+            mApplicationState = new ApplicationState(count, targetTimeAsMinutes);
             post();
         }
 
         public void post() {
-            postValue(mAllTimerState);
+            postValue(mApplicationState);
         }
     }
 }

@@ -29,14 +29,12 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.view.View;
 import android.widget.TextView;
 
-import java.util.HashMap;
-
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static String TAG = "app/MainActivity";
 
     private TimerViewModel mViewModel;
-    private LiveData<HashMap<Integer, TimerState>> mAllTimerState;
+    private LiveData<ApplicationState> mApplicationState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,15 +42,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         mViewModel = ViewModelProviders.of(this).get(TimerViewModel.class);
-        mAllTimerState = mViewModel.getAllTimerState();
+        mApplicationState = mViewModel.getApplicationState();
 
         initializeInterface();
 
-        mAllTimerState.observe(this, new Observer<HashMap<Integer, TimerState>>() {
+        mApplicationState.observe(this, new Observer<ApplicationState>() {
             @Override
-            public void onChanged(@Nullable HashMap<Integer, TimerState> allTimerState) {
-                if (allTimerState != null) {
-                    updateInterface(allTimerState);
+            public void onChanged(@Nullable ApplicationState applicationState) {
+                if (applicationState != null) {
+                    updateInterface(applicationState);
                 }
             }
         });
@@ -88,9 +86,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void updateInterface(HashMap<Integer, TimerState> allTimerState) {
+    private void updateInterface(ApplicationState applicationState) {
 
-        for (TimerState state: allTimerState.values()) {
+        for (TimerState state: applicationState.getAllTimerState().values()) {
 
             View view = findViewById(state.getId());
             TextView time = view.findViewById(R.id.time);
