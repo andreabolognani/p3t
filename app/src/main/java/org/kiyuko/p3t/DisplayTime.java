@@ -19,6 +19,8 @@ package org.kiyuko.p3t;
 
 public class DisplayTime {
 
+    private static String TAG = "app/DisplayTime";
+
     private int mMinutes;
     private int mSeconds;
 

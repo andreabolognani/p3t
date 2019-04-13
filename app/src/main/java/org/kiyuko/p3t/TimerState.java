@@ -19,6 +19,8 @@ package org.kiyuko.p3t;
 
 public class TimerState {
 
+    private static String TAG = "app/TimerState";
+
     public enum Status {
         STOPPED,
         RUNNING,

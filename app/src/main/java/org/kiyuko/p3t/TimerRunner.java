@@ -30,6 +30,8 @@ import java.util.TimerTask;
 
 public class TimerRunner extends TimerTask {
 
+    private static String TAG = "app/TimerRunner";
+
     private static int UPDATE_PERIOD = 100;
 
     private static TimerRunner INSTANCE;

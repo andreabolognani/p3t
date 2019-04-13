@@ -33,6 +33,8 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private static String TAG = "app/MainActivity";
+
     private TimerViewModel mViewModel;
     private LiveData<HashMap<Integer, TimerState>> mAllTimerState;
 
