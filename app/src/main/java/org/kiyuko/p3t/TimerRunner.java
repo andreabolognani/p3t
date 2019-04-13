@@ -91,6 +91,7 @@ public class TimerRunner extends TimerTask {
         state = applicationState.getAllTimerState().get(state.getId());
 
         stopSound(state);
+        applicationState.setUserAttentionNeeded(false);
 
         DisplayTime displayTime = new DisplayTime(state.getCurrentTime());
         int minutes = displayTime.getMinutes();
@@ -121,6 +122,7 @@ public class TimerRunner extends TimerTask {
         state = applicationState.getAllTimerState().get(state.getId());
 
         stopSound(state);
+        applicationState.setUserAttentionNeeded(false);
 
         DisplayTime displayTime = new DisplayTime(state.getCurrentTime());
         int minutes = displayTime.getMinutes();
@@ -155,6 +157,7 @@ public class TimerRunner extends TimerTask {
         state = applicationState.getAllTimerState().get(state.getId());
 
         stopSound(state);
+        applicationState.setUserAttentionNeeded(false);
 
         switch (state.getStatus()) {
             case STOPPED: {
@@ -205,6 +208,7 @@ public class TimerRunner extends TimerTask {
                     state.setCurrentTime(0);
 
                     startSound(state);
+                    applicationState.setUserAttentionNeeded(true);
                 }
             }
         }

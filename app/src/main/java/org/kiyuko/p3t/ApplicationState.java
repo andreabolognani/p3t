@@ -24,6 +24,7 @@ public class ApplicationState {
     private static String TAG = "app/ApplicationState";
 
     private HashMap<Integer, TimerState> mAllTimerState;
+    private boolean mUserAttentionNeeded;
 
     public ApplicationState(int count, int targetTimeAsMinutes) {
         mAllTimerState = new HashMap<>();
@@ -37,9 +38,19 @@ public class ApplicationState {
 
             mAllTimerState.put(i, state);
         }
+
+        mUserAttentionNeeded = false;
     }
 
     public HashMap<Integer, TimerState> getAllTimerState() {
         return mAllTimerState;
+    }
+
+    public void setUserAttentionNeeded(boolean userAttentionNeeded) {
+        mUserAttentionNeeded = userAttentionNeeded;
+    }
+
+    public boolean getUserAttentionNeeded() {
+        return mUserAttentionNeeded;
     }
 }
