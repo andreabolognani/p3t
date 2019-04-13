@@ -82,7 +82,13 @@ public class TimerRunner extends TimerTask {
     }
 
     public void up(TimerState state) {
-        state = mApplicationState.getValue().getAllTimerState().get(state.getId());
+        ApplicationState applicationState = mApplicationState.getValue();
+
+        if (applicationState == null) {
+            return;
+        }
+
+        state = applicationState.getAllTimerState().get(state.getId());
 
         stopSound(state);
 
@@ -106,7 +112,13 @@ public class TimerRunner extends TimerTask {
     }
 
     public void down(TimerState state) {
-        state = mApplicationState.getValue().getAllTimerState().get(state.getId());
+        ApplicationState applicationState = mApplicationState.getValue();
+
+        if (applicationState == null) {
+            return;
+        }
+
+        state = applicationState.getAllTimerState().get(state.getId());
 
         stopSound(state);
 
@@ -134,7 +146,13 @@ public class TimerRunner extends TimerTask {
     }
 
     public void action(TimerState state) {
-        state = mApplicationState.getValue().getAllTimerState().get(state.getId());
+        ApplicationState applicationState = mApplicationState.getValue();
+
+        if (applicationState == null) {
+            return;
+        }
+
+        state = applicationState.getAllTimerState().get(state.getId());
 
         stopSound(state);
 
