@@ -1,3 +1,14 @@
+P3T 2.2.0
+=========
+
+Released on 2019-04-14.
+
+New features
+------------
+
+  * Turn the screen on automatically when a timer finishes.
+
+
 P3T 2.0.0
 =========
 
