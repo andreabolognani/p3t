@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private TimerViewModel mViewModel;
     private LiveData<ApplicationState> mApplicationState;
+    private boolean mLastUserAttentionNeeded;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mViewModel = ViewModelProviders.of(this).get(TimerViewModel.class);
         mApplicationState = mViewModel.getApplicationState();
+        mLastUserAttentionNeeded = false;
 
         initializeInterface();
 
@@ -113,6 +115,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void updateScreenStatus(ApplicationState applicationState) {
 
+        // We only need to do this if the state changed since last time we checked
+        if (applicationState.getUserAttentionNeeded() == mLastUserAttentionNeeded) {
+            return;
+        }
+
         int windowFlags = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
         int wakeLockFlags = PowerManager.SCREEN_DIM_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP;
 
@@ -146,6 +153,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             getWindow().clearFlags(windowFlags);
         }
+
+        mLastUserAttentionNeeded = applicationState.getUserAttentionNeeded();
     }
 
     @Override
